@@ -1,3 +1,7 @@
 # rimuove file con estensione
 
 *.txt
+
+# rimuove cartelle indesiderate
+
+db/
