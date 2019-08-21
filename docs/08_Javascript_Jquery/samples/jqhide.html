@@ -1,0 +1,27 @@
+<html>
+<head>
+<style>
+    img {width:300;height:300}
+</style>
+<script type=text/javascript src=jquery.js>
+</script>
+</head>
+<body>
+<script type=text/javascript>
+$(document).ready(function(){
+  $("button#text").click(function(){
+        $("p").hide();
+        })
+  $("button#pic").click(function(){
+        $("img").hide();
+        });
+  })
+</script> 
+
+<img src=questions.jpg> <br>
+<button id=pic> Hide image</button>
+<br><br><br>
+<p color:red> Text to be hidden </p><br>
+<button id=text>Hide text</button>
+</body>
+       

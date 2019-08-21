@@ -1,0 +1,29 @@
+<html>
+<head>
+<style>
+    img {width:300;height:300}
+</style>
+<script type=text/javascript src=jquery.js>
+</script>
+<script type=text/javascript>
+$(document).ready(function(){
+  $("button#text").click(function(){
+        $("p").toggle("slow", function(){alert("Operation on text done");} );
+        });
+  $("button#pic").click(function(){
+        $("img").toggle("normal", function(){alert("Operation on image done");} );
+	});
+
+});
+</script>
+</head>
+<body>
+<img src=questions.jpg> <br>
+<button id=pic> Show/hide image</button>
+<br><br><br>
+<p color:red> Text to be hidden </p><br>
+<button id=text>Show/hide text</button>
+</body>
+</html>
+
+       

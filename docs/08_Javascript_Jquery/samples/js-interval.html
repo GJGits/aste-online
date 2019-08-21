@@ -1,0 +1,46 @@
+<HTML>
+<HEAD>
+<STYLE>
+    img {height:200;border:0;}
+</STYLE>
+</HEAD>
+
+<BODY>
+<SCRIPT TYPE="text/javascript">
+var intID = 0; var variable = 0;
+var images = new Array();
+var counter=0;
+for(i=0;i<4;i++)images[i] = 
+    new Image();
+images[0].src ="questions.jpg"; 
+images[1].src = "Caravaggio.jpg";
+images[2].src = "pyramids.jpg"; 
+images[3].src = "Renoir.jpg";
+
+function startChange() {
+  intID = setInterval("change()",1000); 
+} 
+
+function change() {
+  counter = (++counter)%4;
+  document.image.src = images[counter].src;
+}
+
+function stopChange() {
+  clearInterval(intID);
+}
+</SCRIPT>
+
+<TABLE> <TR> 
+<TD> <IMG SRC="a.gif" NAME="image">
+<TD>
+<FORM>
+<INPUT TYPE="button" VALUE="Start"   
+     onClick="startChange()"><P>
+<INPUT TYPE="button" VALUE="Stop"   
+     onClick="stopChange()">
+</FORM>
+</TABLE>
+</BODY>
+</HTML>
+

@@ -1,0 +1,22 @@
+<html>
+<head>
+<script type="text/javascript">
+function entrycheck(){
+ try{
+    var agecheck=prompt("How old are you?")
+    if (isNaN(parseInt(agecheck)))
+     throw new Error("Please enter a valid age")
+    else if (agecheck<13)
+     throw new Error("You are too young!")
+     else alert("Enjoy!")
+   }
+  catch(e){
+    alert(e.name+" "+e.message)
+   }
+}
+</script> 
+</head>
+<body>
+<input type="button" value="Check" onclick="entrycheck()">
+</body>
+</html>

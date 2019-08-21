@@ -1,0 +1,37 @@
+<HTML>
+<HEAD>
+<STYLE>
+  img {width:200;height:200}
+</STYLE>
+<SCRIPT TYPE="text/javascript">
+var tID = 0;
+function change() {
+  document.image.src="Caravaggio.jpg";
+};
+function setTimer() {
+  var sec =
+      parseInt(document.myform.seconds.value);
+  if(!tID) 
+     tID= setTimeout("change()",sec*1000);
+}
+function cancelTimer() {
+  if (tID) {
+     clearTimeout(tID);  tID=0;
+  }
+};
+</SCRIPT>
+</HEAD>
+<BODY>
+<IMG name= "image" src="questions.jpg">
+<FORM name="myform">
+In how many seconds do you want to change image? 
+&nbsp; 
+<INPUT TYPE="text" name="seconds" size="2">
+&nbsp; 
+<INPUT TYPE="button" value="Change" 
+onClick="setTimer()"> &nbsp; &nbsp;
+<INPUT TYPE="button" value="Cancel" 
+onClick="cancelTimer()">
+</FORM>
+</BODY>
+</HTML>

@@ -1,0 +1,28 @@
+<html>
+<head>
+<style>
+img {width:200;height:200}
+</style>
+<script type="text/javascript">
+var i=1;
+function change(){ 
+    if(i==0) {
+        document.images["banner"].src="questions.jpg";
+        i=1
+   } else {
+        document.images["banner"].src="caravaggio.jpg";
+        i=0;
+   }
+   document.getElementById('text').value = "New Text";
+}
+</script> 
+</head>
+<body>
+<img src="questions.jpg" name="banner">
+<input type="button" value="Change" onclick="change()">
+<FORM>
+<INPUT TYPE="TEXT" id="text">
+</FORM>
+
+</body>
+</html>

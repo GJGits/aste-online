@@ -8,3 +8,11 @@
     border-left-width: .25rem;
     border-radius: .25rem;
 }
+
+.table-orange {
+    background-color: darkorange;
+}
+
+.text-orange {
+    color: darkorange;
+}

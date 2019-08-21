@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<title>Tryit Editor v2.6</title>
+<meta name="viewport" content="width=device-width">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="tryitstyle.css">
+<!--[if lt IE 8]>
+<style>
+.textareacontainer, .iframecontainer {width:48%;}
+.textarea, .iframe {height:800px;}
+#textareaCode, #iframeResult {height:700px;}
+.menu img {display:none;}
+</style>
+<![endif]-->
+<script>
+if (window.addEventListener) {              
+    window.addEventListener("resize", browserResize);
+} else if (window.attachEvent) {                 
+    window.attachEvent("onresize", browserResize);
+}
+var xbeforeResize = window.innerWidth;
+
+function browserResize() {
+    var afterResize = window.innerWidth;
+    if ((xbeforeResize < (970) && afterResize >= (970)) || (xbeforeResize >= (970) && afterResize < (970)) ||
+        (xbeforeResize < (728) && afterResize >= (728)) || (xbeforeResize >= (728) && afterResize < (728)) ||
+        (xbeforeResize < (468) && afterResize >= (468)) ||(xbeforeResize >= (468) && afterResize < (468))) {
+        xbeforeResize = afterResize;
+        googletag.cmd.push(function() {
+            googletag.pubads().refresh([gptAdSlots[0]]);
+        });
+    }
+}
+</script>
+<script type="text/javascript">
+    var samples = ['js-alert.html',
+                   'js-confirm.html',
+                   'js-prompt.html',
+                   'js-var-assign.html',
+                   'js-error-trycatch.html',
+                   'js-age.html',
+                   'js-openwindow.html',
+                   'js-swap.html',
+                   'js-mouse.html',
+                   'js-resize.html',
+                   'js-timeout.html',
+                   'js-interval.html',
+                   'js-animation.html',
+                   'jqhide.html',
+                   'jqtoggle.html',
+                   'jqslide.html',
+                   'jqfade.html',
+                   'jqhello.html',
+                   'jqmove.html',
+                   'jqblock.html',
+                   'jqtext.html',
+                   'jqcss.html'];
+    var current=0;
+function submitTryit() {
+  var text = document.getElementById("textareaCode").value;
+  var ifr = document.createElement("iframe");
+  ifr.setAttribute("frameborder", "0");
+  ifr.setAttribute("id", "iframeResult");  
+  document.getElementById("iframewrapper").innerHTML = "";
+  document.getElementById("iframewrapper").appendChild(ifr);
+  var ifrw = (ifr.contentWindow) ? ifr.contentWindow : (ifr.contentDocument.document) ? ifr.contentDocument.document : ifr.contentDocument;
+  ifrw.document.open();
+  ifrw.document.write(text);  
+  ifrw.document.close();
+  //23.02.2016: contentEditable is set to true, to fix text-selection (bug) in firefox.
+  //(and back to false to prevent the content from being editable)
+  //(To reproduce the error: Select text in the result window with, and without, the contentEditable statements below.)  
+  if (ifrw.document.body && !ifrw.document.body.isContentEditable) {
+    ifrw.document.body.contentEditable = true;
+    ifrw.document.body.contentEditable = false;
+  }
+}
+function ajaxRequest() {
+	try { // Non IE Browser? 
+	    var request = new XMLHttpRequest()
+	} catch(e1){ // No
+	    try { // IE 6+?
+	        request = new ActiveXObject("Msxml2.XMLHTTP")
+	    } catch(e2){ // No
+		   try { // IE 5?
+		       request = new ActiveXObject("Microsoft.XMLHTTP")
+		   } catch(e3){ // No AJAX Support
+			request = false
+		   }
+      }
+   }
+   return request
+}
+function showCurrent() {
+    var xhttp = ajaxRequest();
+    xhttp.onreadystatechange = function() {
+        if (xhttp.readyState == 4 && xhttp.status == 200) {
+            document.getElementById("textareaCode").value = xhttp.responseText;
+            submitTryit();
+            document.getElementById("fileNameLabel").innerHTML = samples[current];
+        }
+    }
+    xhttp.open("GET", samples[current], true);
+    xhttp.send();
+    
+    // document.getElementById("textareaCode").value=samples[current];
+}
+function goToNext() {
+    current=(current+1)%(samples.length);
+    showCurrent();
+}
+function goToPrev() {
+    current=(current+samples.length-1)%(samples.length);
+    showCurrent();
+}
+</script>
+</head>
+<body>
+<div class="container">
+  <div class="textareacontainer">
+    <div class="textarea">
+      <div style="overflow:auto;">
+        <div class="headerText" id="fileNameLabel">HTML File:</div>
+        <button class="seeResult" type="button" onclick="submitTryit()">See Result &raquo;</button>
+        <button class="seeResult" type="button" onclick="goToNext()">Next</button>
+        <button class="seeResult" type="button" onclick="goToPrev()">Prev</button>
+      </div>
+      <div class="textareawrapper">
+        <textarea autocomplete="off" class="code_input" id="textareaCode" wrap="logical" spellcheck="false">
+
+        </textarea>
+          <form autocomplete="off" style="margin:0px;display:none;">
+            <input type="hidden" name="code" id="code" />
+            <input type="hidden" id="bt" name="bt" />
+          </form>
+       </div>
+    </div>
+  </div>
+  <div class="iframecontainer">
+    <div class="iframe">
+      <div style="overflow:auto;">
+        <div class="headerText">Result:</div>
+      </div>
+      <div id="iframewrapper" class="iframewrapper">
+        
+      </div>
+    </div>
+  </div>
+  <div class="footerText">Try it Yourself - &copy; <a href="http://www.w3schools.com">w3schools.com</a></div>      
+</div>
+<script>showCurrent()</script>
+</body>
+</html>

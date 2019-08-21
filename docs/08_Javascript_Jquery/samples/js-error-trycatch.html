@@ -1,0 +1,21 @@
+<html>
+<head>
+<script type="text/javascript">
+
+function message()
+{  var txt="";
+   try { 
+       eval(adddlert("Welcome!"));
+   } catch(err) {
+      txt="Error in this page\n\n";
+      txt+="Type: "+err.name+"\tDescription:"+err.message+"\n\n";
+      txt+="Click OK to continue.\n\n";
+      alert(txt);
+  }
+}
+</script>
+</head>
+<body>
+<input type="button" value="Message" onclick="message()" />
+</body>
+</html> 

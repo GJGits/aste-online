@@ -27,23 +27,25 @@ $logged=isset($_SESSION["username"]);
         <div class="row">
     <?php include "navbar.php"; ?>
 <div class="col-9">
-    <form class="col-6 offset-3 bg-info p-2" action="auth.php" method="post">
+    <form class="col-6 offset-3 bg-warning p-2" action="auth.php" method="post">
   <div class="form-group">
     <label for="exampleInputEmail1">Email address</label>
-    <input type="email" class="form-control" id="exampleInputEmail1" name="email" aria-describedby="emailHelp" placeholder="Enter email">
+    <input type="email" class="form-control" id="exampleInputEmail1" name="email" aria-describedby="emailHelp" placeholder="Enter email" email required>
   </div>
   <div class="form-group">
     <label for="exampleInputPassword1">Password</label>
-    <input type="password" class="form-control" name="password" id="exampleInputPassword1" placeholder="Password">
+    <input type="password" class="form-control" name="password" id="exampleInputPassword1" placeholder="Password" required>
   </div>
-  <!--
-  <div class="form-check">
-    <input type="checkbox" class="form-check-input" id="exampleCheck1">
-    <label class="form-check-label" for="exampleCheck1">Check me out</label>
-  </div>
-  -->
-  <button type="submit" class="btn btn-warning btn-block mt-5">Sign in</button>
+  <p class="text-danger text-center"><b><?php 
+      if(isset($_SESSION["sign-in-error"])) {
+        echo $_SESSION["sign-in-error"];
+        unset($_SESSION["sign-in-error"]);
+      }
+  ?></b></p>
+  <button type="submit" class="btn btn-primary btn-block mt-5">Sign in</button>
 </form>
+
+<?php include "noscript.php";?>
   
   </div>
     

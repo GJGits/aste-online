@@ -1,0 +1,65 @@
+<style name="first" type="text/css">
+#banner
+{
+  left:0px;top:0px;font-size:x-medium;
+  font-family: Roman;
+  color:#FF00FF;width:300px;position:relative;
+}
+img {width:200;height:200}
+</style>
+<script type="text/javascript">
+var xmin=0; var x=0;
+var xmax=300;
+var deltax=5;
+var intBlink=0;
+var intBanner=0;
+
+function move() { 
+  var elem=document.getElementById("banner");
+  if (x>=xmax) x=0
+  else x+=10;
+  elem.style.left=x+"px";
+}
+
+function blink() {
+  var elem=document.getElementById("logo");
+  if(elem.style.visibility=="hidden")
+    elem.style.visibility="visible";
+  else
+    elem.style.visibility="hidden";
+};
+
+function startBanner() {
+  if (!intBanner) 
+    intBanner=setInterval(move,40);
+};
+
+function stopBanner() {
+  clearInterval(intBanner);
+  intBanner=0;
+};
+
+function startBlinking() {
+  if (!intBlink)
+    intBlink=setInterval(blink,500);
+};
+
+function stopBlinking() {
+  clearInterval(intBlink);
+  intBlink=0;
+};
+</script>
+<body>
+<div id="banner" > Hello!</div>
+<br><br> <br>
+
+<img src="logo_poli.png" id="logo">
+
+<br>
+<form name=myform>
+<input type=button onclick=startBanner() value="Start banner"> 
+<input type=button onclick=stopBanner() value="Stop banner">
+<br>
+<input type=button onclick=startBlinking() value="Start blinking"> 
+<input type=button onclick=stopBlinking() value="Stop blinking">
+</body>

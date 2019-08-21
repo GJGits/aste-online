@@ -6,6 +6,11 @@ if (session_status() == PHP_SESSION_NONE) {
 
 $logged=isset($_SESSION["username"]);
 
+if($logged){
+  header("location: index.php");
+  exit();
+}
+
 ?>
 
 <html lang="en">
@@ -19,7 +24,7 @@ $logged=isset($_SESSION["username"]);
     <script src="custom-js.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    <title>Sign in</title>
+    <title>Sign up</title>
 </head>
 <body>
 <div class="container">
@@ -27,28 +32,33 @@ $logged=isset($_SESSION["username"]);
         <div class="row">
     <?php include "navbar.php"; ?>
 <div class="col-9">
-    <form class="col-6 offset-3 bg-info p-2" action="auth.php" method="post">
+    <form class="col-6 offset-3 bg-warning p-2" action="sup.php" method="post" id="supf">
   <div class="form-group">
     <label for="exampleInputEmail1">Email address</label>
-    <input type="email" class="form-control" id="exampleInputEmail1" name="email" aria-describedby="emailHelp" placeholder="Enter email">
+    <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="Enter email">
+    <?php 
+        if(isset($_SESSION["email_error"])) {
+          echo '<script>
+            $("#email")[0].setCustomValidity("'.$_SESSION["email_error"] .'");
+          </script>';
+          //echo "<p class='text-danger'>".$_SESSION['email_error']."</p>";
+          unset($_SESSION["email_error"]);
+        }
+    ?>
   </div>
   <div class="form-group">
     <label for="exampleInputPassword1">Password</label>
-    <input type="password" class="form-control" name="pass" id="pass" placeholder="Password">
+    <input type="password" class="form-control" name="pass" id="pass" placeholder="Password" required>
   </div>
-  <b class="text-danger">debole</b>
+  <b id="pass-level" class="text-danger">debole</b>
   <div class="form-group mt-3">
     <label for="pass2">Ripeti password</label>
-    <input type="password" class="form-control" name="pass2" id="pass2" placeholder="Password">
+    <input type="password" class="form-control" name="pass2" id="pass2" placeholder="Password" required>
   </div>
-  <!--
-  <div class="form-check">
-    <input type="checkbox" class="form-check-input" id="exampleCheck1">
-    <label class="form-check-label" for="exampleCheck1">Check me out</label>
-  </div>
-  -->
-  <button type="submit" class="btn btn-warning btn-block mt-5">Sign up</button>
+  <button type="submit" class="btn btn-primary btn-block mt-5">Sign up</button>
 </form>
+
+<?php include "noscript.php";?>
   
   </div>
     

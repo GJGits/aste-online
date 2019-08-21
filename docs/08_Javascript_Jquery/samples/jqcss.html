@@ -1,0 +1,28 @@
+<html>
+<head>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $("#para").click(function(){
+    if ($("p").css("background-color")=="rgb(255, 255, 0)")
+              $("p").css("background-color","rgb(0, 255, 0)")
+          else $("p").css("background-color","rgb(255, 255, 0)");})
+   $("#mag").click(function(){
+    $("div").height("+=100");
+    $("div").width("+=100");})
+   $("#shr").click(function(){
+    $("div").height("-=100");
+    $("div").width("-=100");})
+;})
+</script> 
+</head>
+
+<body>
+<div style="background:#98bf21;height:300px;width:300px;position:relative">
+<p>Text where we want to change background</p>
+</div>
+<button id=para> CHANGE</button><br>
+<button id=mag> MAGNIFY</button>
+<button id=shr> SHRINK </button>
+</body>
+</html>

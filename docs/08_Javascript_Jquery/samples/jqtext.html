@@ -1,0 +1,24 @@
+<html>
+<head>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $("#after").click(function(){
+    $("div").after("Effect named after<br>");})
+  $("#prepend").click(function(){
+    $("div").prepend("Effect named prepend<br>");})
+  $("#html").click(function(){
+    $("div").html("New text<br>");})
+});
+</script> 
+</head>
+
+<body>
+<div style="background:#98bf21;height:300px;width:300px;position:relative">
+Initial text
+</div>
+<button id=after> AFTER</button>
+<button id=prepend> PREPEND </button>
+<button id=html> HTML </button>
+</body>
+</html>

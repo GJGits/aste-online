@@ -6,6 +6,12 @@ if (session_status() == PHP_SESSION_NONE) {
 
 $logged=isset($_SESSION["username"]);
 
+function tableColor($em) {
+    $cell_color = $em == "free" ? "table-success" : "table-danger";
+    $cell_color = (isset($_SESSION["username"]) && ($em == $_SESSION["username"])) ? "table-orange" : $cell_color;
+    return $cell_color;
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -29,8 +35,8 @@ $logged=isset($_SESSION["username"]);
     <?php include "navbar.php"; ?>
 
     <?php 
-        
-        $link=mysqli_connect("127.0.0.1","root","mypasswd","s255089");
+        require('env.php');
+        $link=mysqli_connect(getDbHost(),getDbUser(),getDbPass(),getDbName());
 
         if ($link) {
 
@@ -61,7 +67,7 @@ $logged=isset($_SESSION["username"]);
             echo "</thead><tbody><tr><td>$last_hour</td>";
 
             while(mysqli_stmt_fetch($statement)) {
-                $cell_color=$email == "free" ? "table-success" : "table-danger";
+                $cell_color=tableColor($email);
                 if($ora != $last_hour) {
                     echo "</tr><tr>";
                     echo "<td>$ora</td>";
@@ -90,11 +96,12 @@ $logged=isset($_SESSION["username"]);
 
     ?>
 
-    <div class="col-9 offset-2 bd-callout" style="border-left-color: #f0ad4e;">
+    <div class="bd-callout" style="border-left-color: #f0ad4e;">
         <h5>Info su prenotazioni</h5>
         <p>Ogni prenotazione ha la durata di un ora, prenotando ad esempio lo slot 
         monday 08:00 la visita durer&agrave; dalle 08:00 alle 09:00</p> 
     </div>
+    <?php include "noscript.php";?>
 
     </div>
 </body>
