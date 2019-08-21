@@ -24,6 +24,10 @@ $(document).ready(function () {
             oldClass = $(this).attr("class");
             newClass = oldClass === "table-success" ? "table-warning" : "table-success";
             $(this).attr("class", newClass);
+            name = $(this).attr("data-giorno") + "-" + $(this).attr("data-ora");
+            const selector = "#" + name;
+            console.log("name:",$(selector).attr("name"));
+            $(selector).length ? $(selector).remove() : $("#pre-form").append("<input type='text' id='" + name +"' name='" + name + "'></input>");
         }
     });
     // Handler for password security level
@@ -48,13 +52,11 @@ $(document).ready(function () {
     });
     // Validate signup form
     $("#supf").submit(function (event) {
-        //event.preventDefault();
         pass1 = $("#pass").val();
         pass2 = $("#pass2").val();
         if (pass1 !== pass2) {
+            event.preventDefault();
             $("#pass2")[0].setCustomValidity("passwords are different");
-        } else {
-            //$(this).submit();
         }
     });
 });

@@ -12,17 +12,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     if ($link) {
     
-        $query="SELECT COUNT(*) AS co,email FROM utenti WHERE email=? AND PASSWORD=? GROUP BY email";
+        $query="SELECT password FROM utenti WHERE email=?";
         $statement=mysqli_prepare($link,$query);
         if(!$statement) {
             echo mysqli_error($link);
         }
-        mysqli_stmt_bind_param($statement,"ss",$email,$password);
+        mysqli_stmt_bind_param($statement,"s",$email);
         mysqli_stmt_execute($statement);
-        mysqli_stmt_bind_result($statement,$co,$email);
+        mysqli_stmt_bind_result($statement,$hashed_pass);
         mysqli_stmt_fetch($statement);
     
-        if($co==1) {
+        if(password_verify($password, $hashed_pass)) {
             $_SESSION["username"] = $email;
             header("location: index.php");
             exit();

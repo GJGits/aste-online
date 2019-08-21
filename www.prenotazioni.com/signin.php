@@ -1,5 +1,5 @@
 <?php 
-
+ini_set('session.gc_maxlifetime',120);
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }

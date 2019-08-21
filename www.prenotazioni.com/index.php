@@ -1,5 +1,5 @@
 <?php 
-
+ini_set('session.gc_maxlifetime',120);
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
@@ -71,10 +71,10 @@ function tableColor($em) {
                 if($ora != $last_hour) {
                     echo "</tr><tr>";
                     echo "<td>$ora</td>";
-                    echo "<td class='$cell_color' data-email='$email' data-timestamp='$timestamp'></td>";
+                    echo "<td class='$cell_color' data-giorno='$giorno' data-ora='$ora' data-email='$email' data-timestamp='$timestamp'></td>";
                     $last_hour=$ora;
                 } else {
-                    echo "<td class='$cell_color' data-email='$email' data-timestamp='$timestamp'></td>";
+                    echo "<td class='$cell_color' data-giorno='$giorno' data-ora='$ora' data-email='$email' data-timestamp='$timestamp'></td>";
                 }
             }
             echo "</tbody></table></div></div>";
@@ -91,6 +91,7 @@ function tableColor($em) {
                     <button type='button' class='btn btn-warning'>Prenota</button>
           </div>
             </div>";
+            echo "<form id='pre-form' hidden></form>";
         }
 
 
