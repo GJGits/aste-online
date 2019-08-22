@@ -1,8 +1,9 @@
 $(document).ready(function () {
+    let prenotazioni = [];
     // Handler for cell hover
-    $("td").hover(
+    $("#table-owner td").on({
         // handler in
-        function () {
+        mouseenter: function () {
             const email = $(this).attr("data-email");
             const timestamp = $(this).attr("data-timestamp");
             if (email && email !== "free") {
@@ -10,13 +11,13 @@ $(document).ready(function () {
             }
         },
         // handler out
-        function () {
+        mouseleave: function () {
             const email = $(this).attr("data-email");
             if (email && email !== "free") {
                 $(this).html("");
             }
         }
-    );
+    });
     // Handler for cell click
     $("td").click(function () {
         const email = $(this).attr("data-email");
@@ -24,11 +25,61 @@ $(document).ready(function () {
             oldClass = $(this).attr("class");
             newClass = oldClass === "table-success" ? "table-warning" : "table-success";
             $(this).attr("class", newClass);
-            name = $(this).attr("data-giorno") + "-" + $(this).attr("data-ora");
-            const selector = "#" + name;
-            console.log("name:",$(selector).attr("name"));
-            $(selector).length ? $(selector).remove() : $("#pre-form").append("<input type='text' id='" + name +"' name='" + name + "'></input>");
+            name = $(this).attr("data-giorno") + "-" + $(this).attr("data-ora").replace(":", "-");
+            if (prenotazioni.includes(name)) {
+                index = prenotazioni.indexOf(name);
+                prenotazioni.splice(index, 1);
+            } else {
+                prenotazioni.push(name);
+            }
         }
+    });
+    // Handler prenota
+    $("#prenota").click(function () {
+        $.ajax({
+            type: "POST",
+            url: "prenotazioni.php",
+            data: { prenota: true, prenotazioni: prenotazioni },
+            success: function (response) {
+                console.log("response", response);
+                if (response === "occupato" || response === "scaduta") {
+                    // todo: show alert
+                } else {
+                    for (pre of prenotazioni) {
+                        tokens = pre.split("-");
+                        tokensResp = response.split(",");
+                        giorno = tokens[0];
+                        ora = tokens[1] + ":" + tokens[2];
+                        el = $("[data-giorno='" + giorno + "'][data-ora='" + ora + "']");
+                        el.attr("data-email", tokensResp[0]);
+                        el.attr("data-timestamp", tokensResp[1]);
+                        el.attr("class", "table-orange");
+                    }
+                    prenotazioni = []; // azzero perché prenotazione effettuata
+                }
+            }
+        });
+    });
+    // Handler elimina
+    $("#elimina").click(function () {
+        $.ajax({
+            type: "POST",
+            url: "prenotazioni.php",
+            data: { elimina: true },
+            success: function (response) {
+                console.log("response", response);
+                if (response === "scaduta") {
+                    // todo: show alert
+                } else {
+                    elements = $(".table-orange");
+                    for (el of elements) {
+                        el.attr("class", "table-success");
+                        el.attr("data-email", "free");
+                        el.attr("data-timestamp", "");
+                    }
+                }
+            }
+        });
     });
     // Handler for password security level
     $("#pass").on('keyup keypress blur change', function () {
