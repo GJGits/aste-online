@@ -1,18 +1,30 @@
 <?php 
 
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
+    if (session_status() == PHP_SESSION_NONE) {
+        session_start();
+    }
 
-function tableColor($em) {
-    $cell_color = $em == "free" ? "table-success" : "table-danger";
-    $cell_color = (isset($_SESSION["username"]) && ($em == $_SESSION["username"])) ? "table-orange" : $cell_color;
-    return $cell_color;
-}
+    require('env.php');
+
+    function checkSessionValidity() {
+        //TODO: cambiare validità a 120 secondi
+        if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 20)) {
+            session_unset();     // unset $_SESSION variable for the run-time 
+            session_destroy();   // destroy session data in storage
+        } else {
+            $_SESSION['LAST_ACTIVITY'] = time();
+        }
+    }
+
+    function tableColor($em) {
+        $cell_color = $em == "free" ? "table-success" : "table-danger";
+        $cell_color = (isset($_SESSION["username"]) && ($em == $_SESSION["username"])) ? "table-orange" : $cell_color;
+        return $cell_color;
+    }
 
     function loadTable() {
+        checkSessionValidity();
         $logged=$_SESSION["username"];
-        require('env.php');
         $link=mysqli_connect(getDbHost(),getDbUser(),getDbPass(),getDbName());
 
         if ($link) {
@@ -65,6 +77,7 @@ function tableColor($em) {
     }
 
     function prenota() {
+        checkSessionValidity();
         if(isset($_SESSION["username"])) {
             require('env.php');
             $link=mysqli_connect(getDbHost(),getDbUser(),getDbPass(),getDbName());
@@ -105,12 +118,12 @@ function tableColor($em) {
             }
             return $_SESSION["username"]. "," . date("Y-m-d H:i:s");
         } else {
-            //TODO: avvertire l'utente che la sessione è scaduta
             return "scaduta";
         }
     }
 
     function elimina() {
+        checkSessionValidity();
         if(isset($_SESSION["username"])) { 
             require('env.php');
             $link=mysqli_connect(getDbHost(),getDbUser(),getDbPass(),getDbName());
@@ -124,6 +137,21 @@ function tableColor($em) {
         }
     }
 
+    function getInfo($giorno, $ora) {
+        $link=mysqli_connect(getDbHost(),getDbUser(),getDbPass(),getDbName());
+        if($link) {
+            $query="SELECT email, timestamp FROM prenotazioni where giorno=? and ora=?";
+            $statement = mysqli_prepare($link,$query);
+            mysqli_stmt_bind_param($statement,"ss",$giorno,$ora);
+            mysqli_stmt_execute($statement);
+            mysqli_stmt_bind_result($statement,$email,$timestamp);
+            mysqli_stmt_fetch($statement);
+            mysqli_close($link);
+            return $email . "," . $timestamp;
+        }
+        return "no link";
+    }
+
     if(isset($_POST["prenota"]))
         echo prenota();
     
@@ -132,5 +160,7 @@ function tableColor($em) {
     
     if(isset($_POST["load"]))
         echo loadTable();
-
+    
+    if(isset($_POST["info"])) 
+        echo getInfo($_POST["giorno"], $_POST["ora"]);
 ?>

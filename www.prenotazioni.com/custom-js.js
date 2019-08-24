@@ -1,21 +1,44 @@
 $(document).ready(function () {
+    let lastMod = Math.floor(Date.now() / 1000);
     let prenotazioni = [];
+    const sessioneMessage = 'Sessione scaduta, procedere al <a href="signin.php" class="alert-link">login</a>';
+    const occupatoMessage = 'Alcuni degli slot selezionati sono stati prenotati da altri utenti';
+    function showErrorMessage(type) {
+        errorModal = $('#exampleModalCenter');
+        title = type === "sessione" ? "Sessione scaduta" : "Slot occupato";
+        body = type === "sessione" ? sessioneMessage : occupatoMessage;
+        $(".modal-title").text(title);
+        $(".modal-body").html(body);
+        errorModal.modal("show");
+    }
     // Handler for cell hover
     $("#table-owner td").on({
         // handler in
         mouseenter: function () {
-            const email = $(this).attr("data-email");
-            const timestamp = $(this).attr("data-timestamp");
-            if (email && email !== "free") {
-                $(this).html("<small>" + email + "</small><br><small>" + timestamp + "</small>");
-            }
+            cell = $(this);
+            giorno = $(this).attr("data-giorno");
+            ora = $(this).attr("data-ora");
+            $.ajax({
+                type: "POST",
+                url: "prenotazioni.php",
+                data: { info: true, giorno: giorno, ora: ora },
+                success: function (response) {
+                    tokens = response.split(",");
+                    email = tokens[0];
+                    timestamp = tokens[1];
+                    if (email && email !== "free") {
+                        cell.html("<small>" + email + "</small><br><small>" + timestamp + "</small>");
+                    }
+                }
+            });
+
         },
         // handler out
         mouseleave: function () {
-            const email = $(this).attr("data-email");
-            if (email && email !== "free") {
-                $(this).html("");
-            }
+            cell = $(this);
+            email = cell.attr("data-email");
+            if (email && email !== "free")
+                cell.html("");
         }
     });
     // Handler for cell click
@@ -41,9 +64,11 @@ $(document).ready(function () {
             url: "prenotazioni.php",
             data: { prenota: true, prenotazioni: prenotazioni },
             success: function (response) {
-                console.log("response", response);
-                if (response === "occupato" || response === "scaduta") {
-                    // todo: show alert
+                if (response === "scaduta") {
+                    showErrorMessage("sessione");
+                } else if (response === "occupato") {
+                    showErrorMessage("slot");
+                    $("#table-owner").load("prenotazioni.php", { load: true });
                 } else {
                     for (pre of prenotazioni) {
                         tokens = pre.split("-");
@@ -67,16 +92,14 @@ $(document).ready(function () {
             url: "prenotazioni.php",
             data: { elimina: true },
             success: function (response) {
-                console.log("response", response);
                 if (response === "scaduta") {
-                    // todo: show alert
+                    $('#exampleModalCenter').modal('show');
+                    $(".modal-body").append('<div class="alert alert-primary" role="alert">Sessione scaduta, procedere al <a href="signin.php" class="alert-link">login</a></div>');
                 } else {
                     elements = $(".table-orange");
-                    for (el of elements) {
-                        el.attr("class", "table-success");
-                        el.attr("data-email", "free");
-                        el.attr("data-timestamp", "");
-                    }
+                    elements.attr("class", "table-success");
+                    elements.attr("data-email", "free");
+                    elements.attr("data-timestamp", "");
                 }
             }
         });
@@ -103,11 +126,16 @@ $(document).ready(function () {
     });
     // Validate signup form
     $("#supf").submit(function (event) {
+        rgx_robusta = /^(?=(.*\d)+)(?=(.*[!@#$%]){2})[0-9a-zA-Z!@#$%]{3,}$/;
         pass1 = $("#pass").val();
         pass2 = $("#pass2").val();
         if (pass1 !== pass2) {
             event.preventDefault();
-            $("#pass2")[0].setCustomValidity("passwords are different");
+            $("#pass2")[0].setCustomValidity("le due password non coincidono");
+        }
+        if (!rgx_robusta.test(pass1)) {
+            event.preventDefault();
+            $("#pass1")[0].setCustomValidity("il livello di sicurezza deve essere: robusta");
         }
     });
 });
