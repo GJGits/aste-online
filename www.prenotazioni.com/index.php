@@ -17,6 +17,7 @@ $logged=isset($_SESSION["username"]);
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="custom.css">    
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.js"></script>
     <script src="custom-js.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
@@ -30,13 +31,12 @@ $logged=isset($_SESSION["username"]);
         include "navbar.php"; 
         require "prenotazioni.php";
         echo "<div class='col-9' id='table-owner'>";
-        echo loadTable();
         echo "</div>";
         if($logged) {
             echo "<div class='col-9 offset-2'>
                 <div class='btn-group offset-4' role='group' aria-label='Basic example'>
                     <button type='button' id='elimina' class='btn btn-warning mr-5'>Cancella prenotazioni</button>
-                    <button type='button' id='prenota' class='btn btn-warning'>Prenota</button>
+                    <button type='button' id='prenota' class='btn btn-warning' disabled>Prenota</button>
           </div>
             </div>";
             echo '<!-- Modal -->
@@ -64,8 +64,7 @@ $logged=isset($_SESSION["username"]);
         <p>Ogni prenotazione ha la durata di un ora, prenotando ad esempio lo slot 
         monday 08:00 la visita durer&agrave; dalle 08:00 alle 09:00</p> 
     </div>
-    <?php include "noscript.php";?>
-
     </div>
+    <?php include "noscript.php";?>
 </body>
 </html>

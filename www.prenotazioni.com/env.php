@@ -1,8 +1,10 @@
 <?php 
 
     function isLocal() {
-        return ($_SERVER["SERVER_SOFTWARE"] == "Apache/2.4.25 (Debian)") 
-            && ($_SERVER["REMOTE_ADDR"] == "127.0.0.1");
+        $software = $_SERVER["SERVER_SOFTWARE"];
+        //$address = $_SERVER["REMOTE_ADDR"];
+        return ($software == "Apache/2.4.25 (Debian)") ;
+           // && ($_SERVER["REMOTE_ADDR"] == "127.0.0.1");
     }
 
     function getDbHost() {

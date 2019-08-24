@@ -1,62 +1,77 @@
+let prenotazioni = [];
+const sessioneMessage = 'Sessione scaduta, procedere al <a href="signin.php" class="alert-link">login</a>';
+const occupatoMessage = 'Alcuni degli slot selezionati sono stati prenotati da altri utenti';
+
+// Show error messages
+function showErrorMessage(type) {
+    errorModal = $('#exampleModalCenter');
+    title = type === "sessione" ? "Sessione scaduta" : "Slot occupato";
+    body = type === "sessione" ? sessioneMessage : occupatoMessage;
+    $(".modal-title").text(title);
+    $(".modal-body").html(body);
+    errorModal.modal("show");
+}
+
 $(document).ready(function () {
-    let lastMod = Math.floor(Date.now() / 1000);
-    let prenotazioni = [];
-    const sessioneMessage = 'Sessione scaduta, procedere al <a href="signin.php" class="alert-link">login</a>';
-    const occupatoMessage = 'Alcuni degli slot selezionati sono stati prenotati da altri utenti';
-    function showErrorMessage(type) {
-        errorModal = $('#exampleModalCenter');
-        title = type === "sessione" ? "Sessione scaduta" : "Slot occupato";
-        body = type === "sessione" ? sessioneMessage : occupatoMessage;
-        $(".modal-title").text(title);
-        $(".modal-body").html(body);
-        errorModal.modal("show");
-    }
-    // Handler for cell hover
-    $("#table-owner td").on({
-        // handler in
+    $("#table-owner").load("prenotazioni.php", { load: true });
+    // Cookie watcher
+    setInterval(function(){ 
+        if(!$.cookie("PHPSESSID") && !$(".jumbotron").length)  {
+            console.log("cookies disabilitati");
+            $("body").html("");
+            $("body").load("nocookie.html");
+        }
+    }, 2000);
+    // Cell handlers
+    $("#table-owner").on({
         mouseenter: function () {
+            // Handle mouseenter...
             cell = $(this);
-            giorno = $(this).attr("data-giorno");
-            ora = $(this).attr("data-ora");
+            giorno = cell.attr("data-giorno");
+            ora = cell.attr("data-ora");
             $.ajax({
                 type: "POST",
                 url: "prenotazioni.php",
                 data: { info: true, giorno: giorno, ora: ora },
                 success: function (response) {
+                    console.log("response:", response);
                     tokens = response.split(",");
                     email = tokens[0];
                     timestamp = tokens[1];
-                    if (email && email !== "free") {
+                    if (email && email !== "free" && !cell.hasClass("table-success")) {
                         cell.html("<small>" + email + "</small><br><small>" + timestamp + "</small>");
                     }
                 }
             });
 
         },
-        // handler out
         mouseleave: function () {
+            // Handle mouseleave...
             cell = $(this);
             email = cell.attr("data-email");
             if (email && email !== "free")
                 cell.html("");
-        }
-    });
-    // Handler for cell click
-    $("td").click(function () {
-        const email = $(this).attr("data-email");
-        if (email && email === "free") {
-            oldClass = $(this).attr("class");
-            newClass = oldClass === "table-success" ? "table-warning" : "table-success";
-            $(this).attr("class", newClass);
-            name = $(this).attr("data-giorno") + "-" + $(this).attr("data-ora").replace(":", "-");
-            if (prenotazioni.includes(name)) {
-                index = prenotazioni.indexOf(name);
-                prenotazioni.splice(index, 1);
-            } else {
-                prenotazioni.push(name);
+        },
+        click: function () {
+            // Handle click...
+            const email = $(this).attr("data-email");
+            if (email && email === "free") {
+                oldClass = $(this).attr("class");
+                newClass = oldClass === "table-success" ? "table-warning" : "table-success";
+                $(this).attr("class", newClass);
+                name = $(this).attr("data-giorno") + "-" + $(this).attr("data-ora").replace(":", "-");
+                if (prenotazioni.includes(name)) {
+                    index = prenotazioni.indexOf(name);
+                    prenotazioni.splice(index, 1);
+                    if (prenotazioni.length === 0)
+                        $("#prenota").attr("disabled", true);
+                } else {
+                    $("#prenota").attr("disabled", false);
+                    prenotazioni.push(name);
+                }
             }
         }
-    });
+    }, "td");
     // Handler prenota
     $("#prenota").click(function () {
         $.ajax({
@@ -80,8 +95,8 @@ $(document).ready(function () {
                         el.attr("data-timestamp", tokensResp[1]);
                         el.attr("class", "table-orange");
                     }
-                    prenotazioni = []; // azzero perché prenotazione effettuata
                 }
+                prenotazioni = []; // azzero prenotazioni in ogni caso
             }
         });
     });
@@ -101,6 +116,7 @@ $(document).ready(function () {
                     elements.attr("data-email", "free");
                     elements.attr("data-timestamp", "");
                 }
+                prenotazioni = []; // in ogni caso azzero buffer prenotazioni
             }
         });
     });
@@ -108,7 +124,7 @@ $(document).ready(function () {
     $("#pass").on('keyup keypress blur change', function () {
         password = $(this).val();
         pass_level = $("#pass-level");
-        rgx_robusta = /^(?=(.*\d)+)(?=(.*[!@#$%]){2})[0-9a-zA-Z!@#$%]{3,}$/;
+        rgx_robusta = /^(?=(.*\d)+)(?=(.*[!@#$%.-]){2})[0-9a-zA-Z!@#$%.-]{3,}$/;
         rgx_media = /.{3,}/;
         rgx_debole = /.{1,2}/;
         if (!password || password === "" || rgx_debole.test(password)) {
@@ -126,9 +142,10 @@ $(document).ready(function () {
     });
     // Validate signup form
     $("#supf").submit(function (event) {
-        rgx_robusta = /^(?=(.*\d)+)(?=(.*[!@#$%]){2})[0-9a-zA-Z!@#$%]{3,}$/;
+        rgx_robusta = /^(?=(.*\d)+)(?=(.*[!@#$%.-]){2})[0-9a-zA-Z!@#$%.-]{3,}$/;
         pass1 = $("#pass").val();
         pass2 = $("#pass2").val();
+        console.log("pass1:", pass1, "pass2:", pass2);
         if (pass1 !== pass2) {
             event.preventDefault();
             $("#pass2")[0].setCustomValidity("le due password non coincidono");

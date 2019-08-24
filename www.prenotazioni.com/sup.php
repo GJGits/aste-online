@@ -1,6 +1,6 @@
 <?php 
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_SESSION["username"])) {
     if (session_status() == PHP_SESSION_NONE) {
         session_start();
     }
@@ -30,6 +30,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit(); 
     }
 
+    $rgx_pass = '/^(?=(.*\d)+)(?=(.*[!@#$%.-]){2})[0-9a-zA-Z!@#$%.-]{3,}$/';
+
+    if(!preg_match($rgx_pass,$_POST["pass"])) {
+        header("location: signup.php");
+        exit();
+    }
+
     // ##### RIPETI PASSWORD CHECK #####
 
     if(!isset($_POST["pass2"]) || $_POST["pass2"] == "" || ($_POST["pass2"] != $_POST["pass"])) {
@@ -53,26 +60,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mysqli_stmt_bind_param($statement,"s",$email);
         mysqli_stmt_execute($statement);
         mysqli_stmt_bind_result($statement,$co);
-        mysqli_stmt_fetch($statement);
+        mysqli_stmt_store_result($statement);
+        //mysqli_stmt_fetch($statement);
 
-        if($co==1) {
-            $_SESSION["email_error"] = "Account already exists";
-            header("location: index.php");
+        if(mysqli_stmt_num_rows($statement)) {
+            $_SESSION["email"] = $email;
+            $_SESSION["email_error"] = "Esiste già un account con questo indirizzo";
+            header("location: signup.php");
             exit();
         } else {
+            mysqli_stmt_close($statement);
+            $hashed_pass=password_hash($pass1, PASSWORD_BCRYPT);
+            $query="INSERT INTO utenti(email,password) VALUES(?,?)";
+            $statement=mysqli_prepare($link,$query);
+            mysqli_stmt_bind_param($statement,"ss",$email,$hashed_pass);
+            mysqli_stmt_execute($statement);
             mysqli_close($link);
-            $link=mysqli_connect(getDbHost(),getDbUser(),getDbPass(),getDbName());
-            if($link) {
-                $hashed_pass=password_hash($pass1, PASSWORD_BCRYPT);
-                $query="INSERT INTO utenti(email,password) VALUES(?,?)";
-                $statement=mysqli_prepare($link,$query);
-                mysqli_stmt_bind_param($statement,"ss",$email,$hashed_pass);
-                mysqli_stmt_execute($statement);
-                mysqli_close($link);
-                $_SESSION["username"] = $email;
-                header("location: index.php");
-                exit();
-            }
+            $_SESSION["username"] = $email;
+            header("location: index.php");
+            exit();
         }
     
     }

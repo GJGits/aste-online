@@ -35,7 +35,12 @@ if($logged){
     <form class="col-6 offset-3 bg-warning p-2" action="sup.php" method="post" id="supf">
   <div class="form-group">
     <label for="exampleInputEmail1">Email address</label>
-    <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="Enter email">
+    <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="Enter email" value=<?php 
+      if(isset($_SESSION["email"])) { 
+        echo $_SESSION["email"];
+        unset($_SESSION["email"]);
+      }
+    ?>>
     <?php 
         if(isset($_SESSION["email_error"])) {
           echo '<script>

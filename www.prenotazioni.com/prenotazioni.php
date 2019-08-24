@@ -7,8 +7,7 @@
     require('env.php');
 
     function checkSessionValidity() {
-        //TODO: cambiare validità a 120 secondi
-        if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 20)) {
+        if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 120)) {
             session_unset();     // unset $_SESSION variable for the run-time 
             session_destroy();   // destroy session data in storage
         } else {
@@ -79,7 +78,6 @@
     function prenota() {
         checkSessionValidity();
         if(isset($_SESSION["username"])) {
-            require('env.php');
             $link=mysqli_connect(getDbHost(),getDbUser(),getDbPass(),getDbName());
             $query="SELECT email FROM prenotazioni WHERE giorno=? AND ora=?";
             // check if ok
@@ -125,7 +123,6 @@
     function elimina() {
         checkSessionValidity();
         if(isset($_SESSION["username"])) { 
-            require('env.php');
             $link=mysqli_connect(getDbHost(),getDbUser(),getDbPass(),getDbName());
             $query="UPDATE prenotazioni SET email='free' WHERE email=?";
             $statement=mysqli_prepare($link,$query);
@@ -152,15 +149,18 @@
         return "no link";
     }
 
+
     if(isset($_POST["prenota"]))
         echo prenota();
     
-    if(isset($_POST["elimina"]))
+    else if(isset($_POST["elimina"]))
         echo elimina();
     
-    if(isset($_POST["load"]))
+    else if(isset($_POST["load"]))
         echo loadTable();
     
-    if(isset($_POST["info"])) 
+    else if(isset($_POST["info"])) 
         echo getInfo($_POST["giorno"], $_POST["ora"]);
+    
+    
 ?>
