@@ -1,19 +1,8 @@
 <?php 
 
-    if (session_status() == PHP_SESSION_NONE) {
-        session_start();
-    }
-
+    require_once "session.php";
+    sessionStart();
     require('env.php');
-
-    function checkSessionValidity() {
-        if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > 120)) {
-            session_unset();     // unset $_SESSION variable for the run-time 
-            session_destroy();   // destroy session data in storage
-        } else {
-            $_SESSION['LAST_ACTIVITY'] = time();
-        }
-    }
 
     function tableColor($em) {
         $cell_color = $em == "free" ? "table-success" : "table-danger";
@@ -156,11 +145,14 @@
     else if(isset($_POST["elimina"]))
         echo elimina();
     
-    else if(isset($_POST["load"]))
+    else if(isset($_POST["load"])) {
         echo loadTable();
+        exit;
+    }
     
     else if(isset($_POST["info"])) 
         echo getInfo($_POST["giorno"], $_POST["ora"]);
+    
     
     
 ?>

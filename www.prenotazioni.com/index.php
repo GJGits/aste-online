@@ -1,10 +1,9 @@
 <?php 
 
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
+require_once "session.php";
+sessionStart();
 
-$logged=isset($_SESSION["username"]);
+$logged=isLoggedIn();
 
 ?>
 

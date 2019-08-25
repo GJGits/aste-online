@@ -9,5 +9,5 @@ sudo docker run --rm --name ganesh-mysql-v3 \
 # start apache
 sudo docker run -it --rm \
 -v /home/gjcode/Politecnico/prenotazioni-mediche/www.prenotazioni.com:/var/www/html/www.prenotazioni.com/ \
--p 80:80 --network=host \
+-p 80:80 -p 443:443 --network=host \
 --name running-prenotazioni-mediche prenotazioni-mediche
