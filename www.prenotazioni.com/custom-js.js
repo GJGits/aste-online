@@ -15,9 +15,8 @@ function showErrorMessage(type) {
 $(document).ready(function () {
     $("#table-owner").load("prenotazioni.php", { load: true });
     // Cookie watcher
-    setInterval(function(){ 
-        if(!$.cookie("PHPSESSID") && !$(".jumbotron").length)  {
-            console.log("cookies disabilitati");
+    setInterval(function () {
+        if (!$.cookie("PHPSESSID") && !$(".jumbotron").length) {
             $("body").html("");
             $("body").load("nocookie.html");
         }
@@ -54,20 +53,22 @@ $(document).ready(function () {
         },
         click: function () {
             // Handle click...
-            const email = $(this).attr("data-email");
-            if (email && email === "free") {
-                oldClass = $(this).attr("class");
-                newClass = oldClass === "table-success" ? "table-warning" : "table-success";
-                $(this).attr("class", newClass);
-                name = $(this).attr("data-giorno") + "-" + $(this).attr("data-ora").replace(":", "-");
-                if (prenotazioni.includes(name)) {
-                    index = prenotazioni.indexOf(name);
-                    prenotazioni.splice(index, 1);
-                    if (prenotazioni.length === 0)
-                        $("#prenota").attr("disabled", true);
-                } else {
-                    $("#prenota").attr("disabled", false);
-                    prenotazioni.push(name);
+            if ($("#prof-image").length) {
+                const email = $(this).attr("data-email");
+                if (email && email === "free") {
+                    oldClass = $(this).attr("class");
+                    newClass = oldClass === "table-success" ? "table-warning" : "table-success";
+                    $(this).attr("class", newClass);
+                    name = $(this).attr("data-giorno") + "-" + $(this).attr("data-ora").replace(":", "-");
+                    if (prenotazioni.includes(name)) {
+                        index = prenotazioni.indexOf(name);
+                        prenotazioni.splice(index, 1);
+                        if (prenotazioni.length === 0)
+                            $("#prenota").attr("disabled", true);
+                    } else {
+                        $("#prenota").attr("disabled", false);
+                        prenotazioni.push(name);
+                    }
                 }
             }
         }
@@ -108,8 +109,7 @@ $(document).ready(function () {
             data: { elimina: true },
             success: function (response) {
                 if (response === "scaduta") {
-                    $('#exampleModalCenter').modal('show');
-                    $(".modal-body").append('<div class="alert alert-primary" role="alert">Sessione scaduta, procedere al <a href="signin.php" class="alert-link">login</a></div>');
+                    showErrorMessage("sessione");
                 } else {
                     elements = $(".table-orange");
                     elements.attr("class", "table-success");
@@ -145,7 +145,6 @@ $(document).ready(function () {
         rgx_robusta = /^(?=(.*\d)+)(?=(.*[!@#$%.-]){2})[0-9a-zA-Z!@#$%.-]{3,}$/;
         pass1 = $("#pass").val();
         pass2 = $("#pass2").val();
-        console.log("pass1:", pass1, "pass2:", pass2);
         if (pass1 !== pass2) {
             event.preventDefault();
             $("#pass2")[0].setCustomValidity("le due password non coincidono");
