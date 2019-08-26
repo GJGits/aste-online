@@ -20,7 +20,7 @@ foreach($navbar as $nav) {
 }
 
 if (isLoggedIn()) {
-    echo '<li class="list-group-item"><img src="user.png" id="prof-image" alt="..." class="rounded-circle bg-primary mr-2" height="24">' .$_SESSION["username"] .'</li>';
+    echo '<li class="list-group-item"><img src="user.png" id="prof-image" alt="..." class="rounded-circle mx-auto d-block bg-primary" height="24" data-toggle="tooltip" data-placement="right" title="' . $_SESSION["username"] . '"></li>';
 }
 
 echo '</ul></div>';

@@ -11,15 +11,17 @@
     }
 
     function loadTable() {
+        
         checkSessionValidity();
         $logged=$_SESSION["username"];
         $link=mysqli_connect(getDbHost(),getDbUser(),getDbPass(),getDbName());
+        $response = "";
 
-        if ($link) {
+        if($link) {
 
             $days=["monday","tuesday","wednesday","thursday","friday"];
             $hours=["08:00","09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00"];
-            
+                
             $query="SELECT *, CASE
                 WHEN giorno = 'monday' THEN 1
                 WHEN giorno = 'tuesday' THEN 2
@@ -29,37 +31,40 @@
                 END as dayNum
                 FROM prenotazioni
                 ORDER BY ora,dayNum";
-            
+                
             $statement=mysqli_prepare($link,$query);
             mysqli_stmt_execute($statement);
             mysqli_stmt_bind_result($statement,$email,$giorno,$ora,$timestamp,$dayNum);
             $last_hour="08:00";
-
-            $response = "<table class='table table-bordered'>
-            <thead>
-              <tr><th scope='col'>hour</th>";
-              foreach($days as $day) {
-                $response .= "<th scope='col'>$day</th>";
-              }
-              $response .= "</thead><tbody><tr><td>$last_hour</td>";
-
-            while(mysqli_stmt_fetch($statement)) {
-                $cell_color=tableColor($email);
-                if($ora != $last_hour) {
-                    $response .= "</tr><tr>";
-                    $response .= "<td>$ora</td>";
-                    $response .= "<td class='$cell_color' data-giorno='$giorno' data-ora='$ora' data-email='$email' data-timestamp='$timestamp'></td>";
-                    $last_hour=$ora;
-                } else {
-                    $response .= "<td class='$cell_color' data-giorno='$giorno' data-ora='$ora' data-email='$email' data-timestamp='$timestamp'></td>";
+    
+                $response = "<table class='table table-bordered'>
+                <thead>
+                  <tr><th scope='col'>hour</th>";
+                  foreach($days as $day) {
+                    $response .= "<th scope='col'>$day</th>";
+                  }
+                  $response .= "</thead><tbody><tr><td>$last_hour</td>";
+    
+                while(mysqli_stmt_fetch($statement)) {
+                    $cell_color=tableColor($email);
+                    if($ora != $last_hour) {
+                        $response .= "</tr><tr>";
+                        $response .= "<td>$ora</td>";
+                        $response .= "<td class='$cell_color' data-giorno='$giorno' data-ora='$ora' data-email='$email' data-timestamp='$timestamp'></td>";
+                        $last_hour=$ora;
+                    } else {
+                        $response .= "<td class='$cell_color' data-giorno='$giorno' data-ora='$ora' data-email='$email' data-timestamp='$timestamp'></td>";
+                    }
                 }
-            }
-            $response .= "</tbody></table></div>";
+                $response .= "</tbody></table></div>";
+                mysqli_close($link);
+    
 
-
+        } else {
+            $response = '<div class="alert alert-danger" role="alert">Errore di connessione al DB</div>';
         }
 
-        mysqli_close($link);
+
         return $response;
 
     }
@@ -68,7 +73,9 @@
         checkSessionValidity();
         if(isset($_SESSION["username"])) {
             $link=mysqli_connect(getDbHost(),getDbUser(),getDbPass(),getDbName());
-            $query="SELECT email FROM prenotazioni WHERE giorno=? AND ora=?";
+            if ($link) {
+
+                $query="SELECT email FROM prenotazioni WHERE giorno=? AND ora=?";
             // check if ok
             foreach ($_POST["prenotazioni"] as $key => $value) {
                 if($key !== "prenota") {
@@ -104,6 +111,11 @@
                 }
             }
             return $_SESSION["username"]. "," . date("Y-m-d H:i:s");
+
+            } else {
+                return "error-db";
+            }
+            
         } else {
             return "scaduta";
         }
@@ -113,11 +125,16 @@
         checkSessionValidity();
         if(isset($_SESSION["username"])) { 
             $link=mysqli_connect(getDbHost(),getDbUser(),getDbPass(),getDbName());
-            $query="UPDATE prenotazioni SET email='free' WHERE email=?";
-            $statement=mysqli_prepare($link,$query);
-            mysqli_stmt_bind_param($statement,"s",$_SESSION["username"]);
-            mysqli_stmt_execute($statement);
-            mysqli_stmt_close($statement);
+            if ($link) {
+                $query="UPDATE prenotazioni SET email='free' WHERE email=?";
+                $statement=mysqli_prepare($link,$query);
+                mysqli_stmt_bind_param($statement,"s",$_SESSION["username"]);
+                mysqli_stmt_execute($statement);
+                mysqli_stmt_close($statement);
+                mysqli_close($link);
+            } else {
+                return "error-db";
+            }
         } else {
             return "scaduta";
         }
@@ -135,7 +152,7 @@
             mysqli_close($link);
             return $email . "," . $timestamp;
         }
-        return "no link";
+        return "error-db";
     }
 
 

@@ -33,7 +33,9 @@ $(document).ready(function () {
                 url: "prenotazioni.php",
                 data: { info: true, giorno: giorno, ora: ora },
                 success: function (response) {
-                    console.log("response:", response);
+                    if (response === "error-db") {
+                        $("#table-owner").html('<div class="alert alert-danger" role="alert">Errore di connessione al DB</div>');
+                    }
                     tokens = response.split(",");
                     email = tokens[0];
                     timestamp = tokens[1];
@@ -85,6 +87,8 @@ $(document).ready(function () {
                 } else if (response === "occupato") {
                     showErrorMessage("slot");
                     $("#table-owner").load("prenotazioni.php", { load: true });
+                } else if (response === "error-db") {
+                    $("#table-owner").html('<div class="alert alert-danger" role="alert">Errore di connessione al DB</div>');
                 } else {
                     for (pre of prenotazioni) {
                         tokens = pre.split("-");
@@ -110,6 +114,8 @@ $(document).ready(function () {
             success: function (response) {
                 if (response === "scaduta") {
                     showErrorMessage("sessione");
+                } else if (response === "error-db") {
+                    $("#table-owner").html('<div class="alert alert-danger" role="alert">Errore di connessione al DB</div>');
                 } else {
                     elements = $(".table-orange");
                     elements.attr("class", "table-success");
