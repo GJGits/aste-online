@@ -126,9 +126,18 @@
         if(isset($_SESSION["username"])) { 
             $link=mysqli_connect(getDbHost(),getDbUser(),getDbPass(),getDbName());
             if ($link) {
-                $query="UPDATE prenotazioni SET email='free' WHERE email=?";
+                $query="UPDATE prenotazioni 
+                    SET email='free' 
+                    WHERE email=?
+                    AND timestamp IN (
+                        SELECT timestamp FROM ( 
+                            SELECT MAX(timestamp) timestamp
+                            FROM prenotazioni
+                            WHERE email=?
+                            ) t1
+                    )";
                 $statement=mysqli_prepare($link,$query);
-                mysqli_stmt_bind_param($statement,"s",$_SESSION["username"]);
+                mysqli_stmt_bind_param($statement,"ss",$_SESSION["username"],$_SESSION["username"]);
                 mysqli_stmt_execute($statement);
                 mysqli_stmt_close($statement);
                 mysqli_close($link);

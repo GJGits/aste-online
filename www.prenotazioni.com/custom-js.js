@@ -117,10 +117,7 @@ $(document).ready(function () {
                 } else if (response === "error-db") {
                     $("#table-owner").html('<div class="alert alert-danger" role="alert">Errore di connessione al DB</div>');
                 } else {
-                    elements = $(".table-orange");
-                    elements.attr("class", "table-success");
-                    elements.attr("data-email", "free");
-                    elements.attr("data-timestamp", "");
+                    $("#table-owner").load("prenotazioni.php", { load: true });
                 }
                 prenotazioni = []; // in ogni caso azzero buffer prenotazioni
             }
