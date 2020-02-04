@@ -1,6 +1,6 @@
-# prenotazioni-mediche
+# aste-online
 
-Repository contenente i sorgenti per il tema d'esame di Programmazione Distribuita I relativo all'appello di settembre a.a 2018/2019. Il progetto è strutturato per essere utilizzato con [Docker](https://www.docker.com/).
+Repository contenente i sorgenti per il tema d'esame di Programmazione Distribuita I relativo all'appello di febbraio a.a 2019/2020. Il progetto è strutturato per essere utilizzato con [Docker](https://www.docker.com/).
 
 ## Struttura progetto
 
@@ -10,7 +10,7 @@ Repository contenente i sorgenti per il tema d'esame di Programmazione Distribui
 
 > **NB:** i cambiamenti effettuati su questa cartella si riflettono sul db presente nel container.
 
-* **www.prenotazioni.com:** directory contenente i file relativi al sito
+* **www.aste-online.com:** directory contenente i file relativi al sito
 
 ## Attivazione/Disattivazione container
 
