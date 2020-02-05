@@ -13,7 +13,7 @@ function showErrorMessage(type) {
 }
 
 $(document).ready(function () {
-    $("#table-owner").load("prenotazioni.php", { load: true });
+    //$("#table-owner").load("prenotazioni.php", { load: true });
     // Cookie watcher
     setInterval(function () {
         if (!$.cookie("PHPSESSID") && !$(".jumbotron").length) {
@@ -21,60 +21,15 @@ $(document).ready(function () {
             $("body").load("nocookie.html");
         }
     }, 2000);
-    // Cell handlers
-    $("#table-owner").on({
-        mouseenter: function () {
-            // Handle mouseenter...
-            cell = $(this);
-            giorno = cell.attr("data-giorno");
-            ora = cell.attr("data-ora");
-            $.ajax({
-                type: "POST",
-                url: "prenotazioni.php",
-                data: { info: true, giorno: giorno, ora: ora },
-                success: function (response) {
-                    if (response === "error-db") {
-                        $("#table-owner").html('<div class="alert alert-danger" role="alert">Errore di connessione al DB</div>');
-                    }
-                    tokens = response.split(",");
-                    email = tokens[0];
-                    timestamp = tokens[1];
-                    if (email && email !== "free" && !cell.hasClass("table-success")) {
-                        cell.html("<small>" + email + "</small><br><small>" + timestamp + "</small>");
-                    }
-                }
-            });
-
-        },
-        mouseleave: function () {
-            // Handle mouseleave...
-            cell = $(this);
-            email = cell.attr("data-email");
-            if (email && email !== "free")
-                cell.html("");
-        },
-        click: function () {
-            // Handle click...
-            if ($("#prof-image").length) {
-                const email = $(this).attr("data-email");
-                if (email && email === "free") {
-                    oldClass = $(this).attr("class");
-                    newClass = oldClass === "table-success" ? "table-warning" : "table-success";
-                    $(this).attr("class", newClass);
-                    name = $(this).attr("data-giorno") + "-" + $(this).attr("data-ora").replace(":", "-");
-                    if (prenotazioni.includes(name)) {
-                        index = prenotazioni.indexOf(name);
-                        prenotazioni.splice(index, 1);
-                        if (prenotazioni.length === 0)
-                            $("#prenota").attr("disabled", true);
-                    } else {
-                        $("#prenota").attr("disabled", false);
-                        prenotazioni.push(name);
-                    }
-                }
-            }
-        }
-    }, "td");
+    // handler hover offerta
+    $("#off-value").hover(function(){
+        // handler hover in
+        $(this).attr("title", "email@example.com");
+    }
+    , function(){
+        // handler hover out
+        $(this).attr("title", "");
+    });
     // Handler prenota
     $("#prenota").click(function () {
         $.ajax({
@@ -102,24 +57,6 @@ $(document).ready(function () {
                     }
                 }
                 prenotazioni = []; // azzero prenotazioni in ogni caso
-            }
-        });
-    });
-    // Handler elimina
-    $("#elimina").click(function () {
-        $.ajax({
-            type: "POST",
-            url: "prenotazioni.php",
-            data: { elimina: true },
-            success: function (response) {
-                if (response === "scaduta") {
-                    showErrorMessage("sessione");
-                } else if (response === "error-db") {
-                    $("#table-owner").html('<div class="alert alert-danger" role="alert">Errore di connessione al DB</div>');
-                } else {
-                    $("#table-owner").load("prenotazioni.php", { load: true });
-                }
-                prenotazioni = []; // in ogni caso azzero buffer prenotazioni
             }
         });
     });

@@ -24,21 +24,40 @@ $logged=isLoggedIn();
 </head>
 <body>
     <div class="container">
-        <h1 class="text-center mb-5">Prenotazioni Mediche</h1>
+        
+        <h1 class="text-center mt-5 mb-5">Aste Online</h1>
         <div class="row">
-    <?php 
-        include "navbar.php"; 
-        require "prenotazioni.php";
-        echo "<div class='col-9' id='table-owner'>";
-        echo "</div>";
-        if($logged) {
-            echo "<div class='col-9 offset-2'>
-                <div class='btn-group offset-4' role='group' aria-label='Basic example'>
-                    <button type='button' id='elimina' class='btn btn-warning mr-5'>Cancella prenotazioni</button>
-                    <button type='button' id='prenota' class='btn btn-warning' disabled>Prenota</button>
-          </div>
-            </div>";
-            echo '<!-- Modal -->
+    
+    <?php include "navbar.php"; ?>
+    
+    <div class="col-10">
+    <div class="card offset-3 mb-5" style="width: 18rem;">
+      <div class="card-header bg-white">
+        <h5>Winslow Homer</h5>
+        <span class="text-muted">The veteran in a new field</span>
+      </div>
+      <img class="card-img-top" src="winslow_homer_the_veteran_in_a_new_field.jpg" alt="Card image cap">
+      <div class="card-body">
+        <p class="card-text text-center">Offerta attuale: <b id="off-value" data-toggle="tooltip" data-placement="right" title="Tooltip on right">1.00&euro;</b></p>
+       <?php if($logged): ?>
+          <span>Inserire importo: </span> <input id="offerta" type="number" min="1.00" step="0.01" value="1.00"> <button class="btn btn-primary">Offri</button>
+        <?php endif; ?>
+      </div>
+    </div>
+    </div>
+     
+       
+
+
+    <div class="bd-callout" style="border-left-color: #f0ad4e;">
+        <h5>Info su aste</h5>
+        <p>Ogni offerta &egrave; multiplo di 0.01 &euro;. In caso di offerte di pari entit&agrave; verr&agrave; presa in considerazione 
+        solamente la prima offerta.</p> 
+    </div>
+    </div>
+    <?php include "noscript.php";?>
+
+    <!-- Error Modal -->
             <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
               <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content bg-danger">
@@ -53,17 +72,7 @@ $logged=isLoggedIn();
                   </div>
                 </div>
               </div>
-            </div>';
-        }
-    ?>
+            </div>;
 
-
-    <div class="bd-callout" style="border-left-color: #f0ad4e;">
-        <h5>Info su prenotazioni</h5>
-        <p>Ogni prenotazione ha la durata di un ora, prenotando ad esempio lo slot 
-        monday 08:00 la visita durer&agrave; dalle 08:00 alle 09:00</p> 
-    </div>
-    </div>
-    <?php include "noscript.php";?>
 </body>
 </html>

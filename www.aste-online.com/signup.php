@@ -20,7 +20,7 @@
 </head>
 <body>
 <div class="container">
-        <h1 class="text-center mb-5">Prenotazioni Mediche</h1>
+        <h1 class="text-center mt-5 mb-5">Aste Online</h1>
         <div class="row">
     <?php include "navbar.php"; ?>
 <div class="col-9">
