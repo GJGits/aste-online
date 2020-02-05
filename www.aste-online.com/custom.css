@@ -16,3 +16,7 @@
 .text-orange {
     color: darkorange;
 }
+
+.bg-lg {
+    background-color: lightgray;
+}

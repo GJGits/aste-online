@@ -14,7 +14,7 @@
         
         if ($link) {
         
-            $query="SELECT password FROM utenti WHERE email=?";
+            $query="SELECT password FROM users WHERE email=?";
             $statement=mysqli_prepare($link,$query);
             if(!$statement) {
                 echo mysqli_error($link);

@@ -24,30 +24,15 @@
         <div class="row">
     <?php include "navbar.php"; ?>
 <div class="col-9">
-    <form class="col-6 offset-3 bg-warning p-2" action="sup.php" method="post" id="supf">
+    <form class="col-6 offset-3 bg-lg p-2" action="sup.php" method="post" id="supf">
   <div class="form-group">
     <label for="exampleInputEmail1">Email address</label>
-    <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="Enter email" value=<?php 
-      if(isset($_SESSION["email"])) { 
-        echo $_SESSION["email"];
-        unset($_SESSION["email"]);
-      }
-    ?>>
-    <?php 
-        if(isset($_SESSION["email_error"])) {
-          echo '<script>
-            $("#email")[0].setCustomValidity("'.$_SESSION["email_error"] .'");
-          </script>';
-          //echo "<p class='text-danger'>".$_SESSION['email_error']."</p>";
-          unset($_SESSION["email_error"]);
-        }
-    ?>
+    <input type="text" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="Enter email">
   </div>
   <div class="form-group">
     <label for="exampleInputPassword1">Password</label>
-    <input type="password" class="form-control" name="pass" id="pass" placeholder="Password" required>
+    <input type="password" class="form-control" name="pass" id="pass" placeholder="Password" required> 
   </div>
-  <b id="pass-level" class="text-danger">debole</b>
   <div class="form-group mt-3">
     <label for="pass2">Ripeti password</label>
     <input type="password" class="form-control" name="pass2" id="pass2" placeholder="Password" required>

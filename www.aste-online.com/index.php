@@ -40,7 +40,10 @@ $logged=isLoggedIn();
       <div class="card-body">
         <p class="card-text text-center">Offerta attuale: <b id="off-value" data-toggle="tooltip" data-placement="right" title="Tooltip on right">1.00&euro;</b></p>
        <?php if($logged): ?>
-          <span>Inserire importo: </span> <input id="offerta" type="number" min="1.00" step="0.01" value="1.00"> <button class="btn btn-primary">Offri</button>
+       <div class="row">
+          <input id="offerta" type="text" class="col-6 ml-2 mr-2"> <button class="btn btn-sm btn-primary">Fai un'offerta</button>
+       </div>
+         
         <?php endif; ?>
       </div>
     </div>
