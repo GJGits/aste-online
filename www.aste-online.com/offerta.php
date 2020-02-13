@@ -32,7 +32,6 @@
                 mysqli_stmt_fetch($statement);
                 mysqli_stmt_close($statement);
                 if ($_SESSION["username"] == $user) {
-                    //todo: do something
                     $result .= "best;";
                 } else {
                     $result .= "nobest;";
@@ -72,6 +71,7 @@
                 $statement=mysqli_prepare($link,$query);
                 mysqli_stmt_bind_param($statement, "sdd", $_SESSION["username"], $_POST["value"], $_POST["value"]);
                 mysqli_stmt_execute($statement);
+                $rows = mysqli_stmt_affected_rows($statement);
                 mysqli_stmt_close($statement);
                 // 2. log new offer yes: valore aggiornato, no altrimenti
                 $query = "INSERT INTO offers_log (user, amount, status, timestamp)
@@ -82,6 +82,7 @@
                 mysqli_stmt_execute($statement);
                 mysqli_stmt_close($statement);
                 mysqli_close($link);
+                echo "" . $rows;
                 exit;
             }
         } else { 

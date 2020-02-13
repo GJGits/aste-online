@@ -41,7 +41,6 @@ $(document).ready(function () {
         });
     }
     if ($("#off-value").length) {
-        console.log("entro in off");
         $.ajax({
             type: "GET",
             url: "offerta.php",
@@ -100,9 +99,7 @@ $(document).ready(function () {
         off_txt = $("#off-value").text();
         off_value = off_txt.substring(0, off_txt.length - 1);
         offer = $("#offerta").val();
-        console.log("click, offerta:" + offer + ", max_offer: " + off_value);
-        if (off_value && off_rgx.test(offer) && offer > off_value) {
-            console.log("entro");
+        if (off_value && off_rgx.test(offer) && offer > +off_value) {
             $.ajax({
                 type: "POST",
                 url: "offerta.php",
@@ -113,7 +110,11 @@ $(document).ready(function () {
                     } else if (response === "error-db") {
                         $("#err-cont").html('<div class="alert alert-danger" role="alert">Errore di connessione al DB</div>');
                     } else {
-                        $("#off_value").html(response + "&euro");
+                        if (response === "1") {
+                            $("#off-value").html(offer + "&euro;");
+                        } else {
+                            $("#off-error").html("offerta non valida o minore del massimo attuale (ricaricare massimo in tal caso)");
+                        }
                     }
                 }
             });
