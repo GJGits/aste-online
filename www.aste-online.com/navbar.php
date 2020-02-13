@@ -3,11 +3,10 @@
 require_once "session.php";
 sessionStart();
 
-$navbar[true]=['Home','Logout'];
+$navbar[true]=['Home'];
 $navbar[false]=['Home','Sign-in','Sign-up'];
 
 $link["Home"]="index.php";
-$link["Logout"]="logout.php";
 $link["Sign-in"]="signin.php";
 $link["Sign-up"]="signup.php";
 
@@ -20,7 +19,11 @@ foreach($navbar as $nav) {
 }
 
 if (isLoggedIn()) {
-    echo '<li class="list-group-item"><img src="user.png" id="prof-image" alt="..." class="rounded-circle mx-auto d-block bg-primary" height="24" data-toggle="tooltip" data-placement="right" title="' . $_SESSION["username"] . '"></li>';
+    echo '<li class="list-group-item">
+            <a href="personale.php">
+                <img src="user.png" id="prof-image" alt="..." class="rounded-circle mx-auto d-block bg-primary" height="24" data-toggle="tooltip" data-placement="right" title="' . $_SESSION["username"] . '">
+            </a>
+        </li>';
 }
 
 echo '</ul></div>';

@@ -41,7 +41,8 @@ $logged=isLoggedIn();
         <p class="card-text text-center">Offerta attuale: <b id="off-value" data-toggle="tooltip" data-placement="right" title="Tooltip on right">1.00&euro;</b></p>
        <?php if($logged): ?>
        <div class="row">
-          <input id="offerta" type="text" class="col-6 ml-2 mr-2"> <button class="btn btn-sm btn-primary">Fai un'offerta</button>
+          <input id="offerta" type="text" class="col-6 ml-2 mr-2"> <button id="offri" class="btn btn-sm btn-primary">Fai un'offerta</button>
+          <p id="off-error" class="text-danger"></p>
        </div>
          
         <?php endif; ?>
@@ -59,6 +60,9 @@ $logged=isLoggedIn();
     </div>
     </div>
     <?php include "noscript.php";?>
+
+    <div id="err-cont" class="container">
+    </div>
 
     <!-- Error Modal -->
             <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">

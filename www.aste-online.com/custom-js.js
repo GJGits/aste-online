@@ -12,7 +12,54 @@ function showErrorMessage(type) {
 }
 
 $(document).ready(function () {
-    //$("#table-owner").load("prenotazioni.php", { load: true });
+    $("#text-danger").html("");
+    err_cont = $("#err-cont");
+    if (err_cont) {
+        err_cont.html("");
+    }
+    if ($("#table").length) {
+        console.log("entro in table");
+        $.ajax({
+            type: "GET",
+            url: "offerta.php?table=true",
+            success: function (response) {
+                if (response === "scaduta") {
+                    showErrorMessage("sessione");
+                } else if (response === "error-db") {
+                    $("#err-cont").html('<div class="alert alert-danger" role="alert">Errore di connessione al DB</div>');
+                } else {
+                    tokens = response.split(";");
+                    if (tokens.length === 2) {
+                        if (tokens[0] === "best") {
+                            $("#best-offer").html("Attualmente sei il miglior offerente");
+                        }
+                        $("#table").html(tokens[1]);
+                    }
+                }
+
+            }
+        });
+    }
+    if ($("#off-value").length) {
+        console.log("entro in off");
+        $.ajax({
+            type: "GET",
+            url: "offerta.php",
+            success: function (response) {
+                if (response) {
+                    if (response === "error-db") {
+                        $("#err-cont").html('<div class="alert alert-danger" role="alert">Errore di connessione al DB</div>');
+                    } else {
+                        tokens = response.split("-");
+                        user = tokens[0];
+                        amount = tokens[1];
+                        timestamp = tokens[2];
+                        $("#off-value").html("" + amount + "&euro;");
+                    }
+                }
+            }
+        });
+    }
     // Cookie watcher
     setInterval(function () {
         if (!$.cookie("PHPSESSID") && !$(".jumbotron").length) {
@@ -21,43 +68,60 @@ $(document).ready(function () {
         }
     }, 2000);
     // handler hover offerta
-    $("#off-value").hover(function(){
+    $("#off-value").hover(function () {
         // handler hover in
-        $(this).attr("title", "email@example.com");
-    }
-    , function(){
-        // handler hover out
-        $(this).attr("title", "");
-    });
-    // Handler prenota
-    $("#prenota").click(function () {
         $.ajax({
-            type: "POST",
-            url: "prenotazioni.php",
-            data: { prenota: true, prenotazioni: prenotazioni },
+            type: "GET",
+            url: "offerta.php",
             success: function (response) {
                 if (response === "scaduta") {
                     showErrorMessage("sessione");
-                } else if (response === "occupato") {
-                    showErrorMessage("slot");
-                    $("#table-owner").load("prenotazioni.php", { load: true });
                 } else if (response === "error-db") {
-                    $("#table-owner").html('<div class="alert alert-danger" role="alert">Errore di connessione al DB</div>');
+                    $("#err-cont").html('<div class="alert alert-danger" role="alert">Errore di connessione al DB</div>');
                 } else {
-                    for (pre of prenotazioni) {
-                        tokens = pre.split("-");
-                        tokensResp = response.split(",");
-                        giorno = tokens[0];
-                        ora = tokens[1] + ":" + tokens[2];
-                        el = $("[data-giorno='" + giorno + "'][data-ora='" + ora + "']");
-                        el.attr("data-email", tokensResp[0]);
-                        el.attr("data-timestamp", tokensResp[1]);
-                        el.attr("class", "table-orange");
-                    }
+                    tokens = response.split("-");
+                    user = tokens[0];
+                    amount = tokens[1];
+                    timestamp = tokens[2];
+                    $("#off-value").html("" + amount + "&euro;");
+                    $("#off-value").attr("title", user);
                 }
-                prenotazioni = []; // azzero prenotazioni in ogni caso
             }
         });
+    }
+        , function () {
+            // handler hover out
+            $(this).attr("title", "");
+        });
+    // Handler offri
+    $("#offri").click(function () {
+        $("#off-error").html("");
+        off_rgx = /^\d{1,9}\.\d{2}$/;
+        off_txt = $("#off-value").text();
+        off_value = off_txt.substring(0, off_txt.length - 1);
+        offer = $("#offerta").val();
+        console.log("click, offerta:" + offer + ", max_offer: " + off_value);
+        if (off_value && off_rgx.test(offer) && offer > off_value) {
+            console.log("entro");
+            $.ajax({
+                type: "POST",
+                url: "offerta.php",
+                data: { offri: true, value: offer },
+                success: function (response) {
+                    if (response === "scaduta") {
+                        showErrorMessage("sessione");
+                    } else if (response === "error-db") {
+                        $("#err-cont").html('<div class="alert alert-danger" role="alert">Errore di connessione al DB</div>');
+                    } else {
+                        $("#off_value").html(response + "&euro");
+                    }
+                }
+            });
+        } else {
+            // offerta non valida o minore del massimo attuale (ricaricare massimo)
+            $("#off-error").html("offerta non valida o minore del massimo attuale (ricaricare massimo in tal caso)");
+        }
+
     });
     // Validate signup form
     $("#supf").submit(function (event) {
