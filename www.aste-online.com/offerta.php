@@ -74,11 +74,10 @@
                 $rows = mysqli_stmt_affected_rows($statement);
                 mysqli_stmt_close($statement);
                 // 2. log new offer yes: valore aggiornato, no altrimenti
-                $query = "INSERT INTO offers_log (user, amount, status, timestamp)
-                    VALUES (?, ?, CASE 
-                        WHEN (SELECT MAX(amount) FROM offer) < ? THEN 'yes' ELSE 'no' END, DEFAULT)";
+                $query = "INSERT INTO offers_log (user, amount, timestamp)
+                    VALUES (?, ?, DEFAULT)";
                 $statement=mysqli_prepare($link, $query);
-                mysqli_stmt_bind_param($statement, "sdd", $_SESSION["username"], $_POST["value"], $_POST["value"]);
+                mysqli_stmt_bind_param($statement, "sd", $_SESSION["username"], $_POST["value"]);
                 mysqli_stmt_execute($statement);
                 mysqli_stmt_close($statement);
                 mysqli_close($link);

@@ -18,7 +18,6 @@ $(document).ready(function () {
         err_cont.html("");
     }
     if ($("#table").length) {
-        console.log("entro in table");
         $.ajax({
             type: "GET",
             url: "offerta.php?table=true",
@@ -99,7 +98,7 @@ $(document).ready(function () {
         off_txt = $("#off-value").text();
         off_value = off_txt.substring(0, off_txt.length - 1);
         offer = $("#offerta").val();
-        if (off_value && off_rgx.test(offer) && offer > +off_value) {
+        if (off_value && off_rgx.test(offer)) {
             $.ajax({
                 type: "POST",
                 url: "offerta.php",
@@ -110,6 +109,9 @@ $(document).ready(function () {
                     } else if (response === "error-db") {
                         $("#err-cont").html('<div class="alert alert-danger" role="alert">Errore di connessione al DB</div>');
                     } else {
+                        if (offer < +off_value) {
+                            $("#off-error").html("offerta non valida o minore del massimo attuale (ricaricare massimo in tal caso)");
+                        }
                         if (response === "1") {
                             $("#off-value").html(offer + "&euro;");
                         } else {
@@ -126,7 +128,6 @@ $(document).ready(function () {
     });
     // Validate signup form
     $("#supf").submit(function (event) {
-        rgx_robusta = /^(?=(.*\d)+)(?=(.*[!@#$%.-]){1})[0-9a-zA-Z!@#$%.-]{3,}$/;
         rgx_email = /^\w+@\w+\.\w{2,3}$/;
         email = $("#email").val();
         pass1 = $("#pass").val();
@@ -139,10 +140,6 @@ $(document).ready(function () {
         if (pass1 !== pass2) {
             event.preventDefault();
             $("#pass2")[0].setCustomValidity("le due password non coincidono");
-        }
-        if (!rgx_robusta.test(pass1)) {
-            event.preventDefault();
-            $("#pass")[0].setCustomValidity("password non valida");
         }
     });
 });
