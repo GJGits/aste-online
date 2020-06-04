@@ -31,12 +31,9 @@ if (!isLoggedIn()) {
         <div class="row">
             <?php include "navbar.php"; ?>
             <div class="container col-8">
-            <div class="alert alert-success" role="alert" id="best-offer">
-                
-            </div>
-            <h5 class="mt-5 mb-3"><b>Riepilogo offerte:</b></h5>
+            <h5 class="mt-5 mb-3"><b>Riepilogo tue prenotazioni:</b></h5>
             <!-- TABLE HERE -->
-            <div class="container" id="table">
+            <div class="container" id="table" data-personal="true">
             
             </div>
             <button class="btn btn-primary btn-block"> <a class="text-white" href="logout.php">Logout</a></button>

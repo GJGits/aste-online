@@ -25,24 +25,39 @@ $logged=isLoggedIn();
 <body>
     <div class="container">
         
-        <h1 class="text-center mt-5 mb-5">Aste Online</h1>
+        <h1 class="text-center mt-5 mb-5">Prenotazioni Sala</h1>
         <div class="row">
     
     <?php include "navbar.php"; ?>
     
-    <div class="col-10">
-    <div class="card offset-3 mb-5" style="width: 18rem;">
-      <div class="card-header bg-white">
-        <h5>Winslow Homer</h5>
-        <span class="text-muted">The veteran in a new field</span>
-      </div>
-      <img class="card-img-top" src="winslow_homer_the_veteran_in_a_new_field.jpg" alt="Card image cap">
-      <div class="card-body">
-        <p class="card-text text-center">Offerta attuale: <b id="off-value" data-toggle="tooltip" data-placement="right" title="Tooltip on right">1.00&euro;</b></p>
+      <div id="table" class="offset-2 col-6 justify-content-center">
+      
+      </div> 
+       
        <?php if($logged): ?>
-       <div class="row">
-          <input id="offerta" type="text" class="col-6 ml-2 mr-2"> <button id="offri" class="btn btn-sm btn-primary">Fai un'offerta</button>
-          <p id="off-error" class="text-danger"></p>
+       
+       <div class="container border col-6 offset-4">
+          
+          <div class="row offset-3 mt-4">
+            <span >Seleziona inizio:</span>
+            <input class="col-2 ml-2" id="ini-hh" type="number" min=0 max=23 value="0">
+            <input class="col-2 ml-2" id="ini-mm" type="number" min=0 max=59 value="0">
+          </div>
+
+          <div class="row offset-3 mt-2">
+            <span>Seleziona fine: </span>
+            <input class="col-2 ml-2"  id="fin-hh" type="number" min=0 max=23 value="0">
+            <input class="col-2 ml-2"  id="fin-mm" type="number" min=0 max=59 value="0">
+          </div>
+
+          <div class="row mt-2">
+            <span class="offset-3">Seleziona numero persone</span>
+            <input class="col-2 ml-2" id="npers" type="number" min=1 max=200>
+          </div>
+
+
+          <button id="prenota" class="btn btn-sm btn-primary btn-block mt-4">Effettua prenotazione</button>
+          <p id="pre-error" class="text-danger"></p>
        </div>
          
         <?php endif; ?>
@@ -53,10 +68,9 @@ $logged=isLoggedIn();
        
 
 
-    <div class="bd-callout" style="border-left-color: #f0ad4e;">
-        <h5>Info su aste</h5>
-        <p>Ogni offerta &egrave; multiplo di 0.01 &euro;. In caso di offerte di pari entit&agrave; verr&agrave; presa in considerazione 
-        solamente la prima offerta.</p> 
+    <div class="bd-callout offset-2 col-10" style="border-left-color: #f0ad4e;">
+        <h5>Info prenotazioni</h5>
+        <p>Le prenotazioni fanno riferimento ad unico giorno, inoltre bisogna ricordare che la sala ha una capienza di 200 persone. Questo limite non pu&ograve; essere superato in nessun momento della giornata per nessun motivo.</p> 
     </div>
     </div>
     <?php include "noscript.php";?>

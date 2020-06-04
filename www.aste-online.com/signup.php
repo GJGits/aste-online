@@ -25,10 +25,10 @@
         <div class="row">
     <?php include "navbar.php"; ?>
 <div class="col-9">
-    <form class="col-6 offset-3 bg-lg p-2" action="sup.php" method="post" id="supf">
+    <form class="bg-warning col-6 offset-3 bg-lg p-2">
   <div class="form-group">
     <label for="exampleInputEmail1">Email address</label>
-    <input type="text" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="Enter email">
+    <input type="text" class="form-control" id="user" name="user" aria-describedby="emailHelp" placeholder="Enter username">
   </div>
   <div class="form-group">
     <label for="exampleInputPassword1">Password</label>
@@ -38,7 +38,7 @@
     <label for="pass2">Ripeti password</label>
     <input type="password" class="form-control" name="pass2" id="pass2" placeholder="Password" required>
   </div>
-  <button type="submit" class="btn btn-primary btn-block mt-5">Sign up</button>
+  <button type="button" id="supf" class="btn btn-primary btn-block mt-5">Sign up</button>
 </form>
 
 <?php include "noscript.php";?>

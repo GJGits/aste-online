@@ -18,22 +18,16 @@ $(document).ready(function () {
         err_cont.html("");
     }
     if ($("#table").length) {
+        url = $("#table").data("personal") ? "prenotazione.php?table=true&personal=true" : "prenotazione.php?table=true";
+        console.log("url:", url);
         $.ajax({
             type: "GET",
-            url: "offerta.php?table=true",
+            url: url,
             success: function (response) {
-                if (response === "scaduta") {
-                    showErrorMessage("sessione");
-                } else if (response === "error-db") {
+                if (response === "error-db") {
                     $("#err-cont").html('<div class="alert alert-danger" role="alert">Errore di connessione al DB</div>');
                 } else {
-                    tokens = response.split(";");
-                    if (tokens.length === 2) {
-                        if (tokens[0] === "best") {
-                            $("#best-offer").html("Attualmente sei il miglior offerente");
-                        }
-                        $("#table").html(tokens[1]);
-                    }
+                    $("#table").html(response);
                 }
 
             }
@@ -66,80 +60,155 @@ $(document).ready(function () {
         }
     }, 2000);
     // handler hover offerta
-    $("#off-value").hover(function () {
+    $(document).on('mouseenter', '#table tr', function () {
         // handler hover in
+        element = $(this);
+        inizio = element.data("inizio");
+        fine = element.data("fine");
+        partecipanti = element.data("partecipanti");
         $.ajax({
             type: "GET",
-            url: "offerta.php",
+            url: "prenotazione.php?inizio=" + inizio + "&fine=" + fine + "&partecipanti=" + partecipanti,
             success: function (response) {
                 if (response === "scaduta") {
                     showErrorMessage("sessione");
                 } else if (response === "error-db") {
                     $("#err-cont").html('<div class="alert alert-danger" role="alert">Errore di connessione al DB</div>');
                 } else {
-                    tokens = response.split("-");
-                    user = tokens[0];
-                    amount = tokens[1];
-                    timestamp = tokens[2];
-                    $("#off-value").html("" + amount + "&euro;");
-                    $("#off-value").attr("title", user);
+                    user = response;
+                    element.attr("data-toggle", "tooltip");
+                    element.attr("data-placement", "left");
+                    element.attr("title", user);
                 }
             }
         });
-    }
-        , function () {
-            // handler hover out
-            $(this).attr("title", "");
-        });
+    });
     // Handler offri
-    $("#offri").click(function () {
-        $("#off-error").html("");
-        off_rgx = /^\d{1,9}\.\d{2}$/;
-        off_txt = $("#off-value").text();
-        off_value = off_txt.substring(0, off_txt.length - 1);
-        offer = $("#offerta").val();
-        if (off_value && off_rgx.test(offer)) {
+    $("#prenota").click(function () {
+        $("#pre-error").html("");
+        hmin_rgx = /^\d{1,2}$/;
+        pers_rgx = /^\d{1,3}$/;
+        ini_hh = $("#ini-hh").val();
+        ini_min = $("#ini-mm").val();
+        fin_hh = $("#fin-hh").val();
+        fin_min = $("#fin-mm").val();
+        npers = $("#npers").val();
+        if (hmin_rgx.test(ini_hh) && hmin_rgx.test(ini_min)
+            && hmin_rgx.test(fin_hh) && hmin_rgx.test(fin_min)
+            && ini_hh < 24 && ini_hh >= 0
+            && fin_hh < 24 && fin_hh >= 0
+            && ini_hh <= fin_hh
+            && pers_rgx.test(npers) && npers > 0) {
             $.ajax({
                 type: "POST",
-                url: "offerta.php",
-                data: { offri: true, value: offer },
+                url: "prenotazione.php",
+                data: { offri: true, hhi: ini_hh, mmi: ini_min, hhf: fin_hh, mmf: fin_min, pers: npers },
                 success: function (response) {
                     if (response === "scaduta") {
                         showErrorMessage("sessione");
                     } else if (response === "error-db") {
                         $("#err-cont").html('<div class="alert alert-danger" role="alert">Errore di connessione al DB</div>');
+                    } else if (response === "too-much") {
+                        $("#pre-error").html("superato limite massimo posti");
+                    } else if (response === "err-time") {
+                        $("#pre-error").html("errore orari");
                     } else {
-                        if (offer < +off_value) {
-                            $("#off-error").html("offerta non valida o minore del massimo attuale (ricaricare massimo in tal caso)");
-                        }
-                        if (response === "1") {
-                            $("#off-value").html(offer + "&euro;");
-                        } else {
-                            $("#off-error").html("offerta non valida o minore del massimo attuale (ricaricare massimo in tal caso)");
+                        if ($("#table").length) {
+                            $.ajax({
+                                type: "GET",
+                                url: "prenotazione.php?table=true",
+                                success: function (response) {
+                                    if (response === "error-db") {
+                                        $("#err-cont").html('<div class="alert alert-danger" role="alert">Errore di connessione al DB</div>');
+                                    } else {
+                                        $("#table").html(response);
+                                    }
+
+                                }
+                            });
                         }
                     }
                 }
             });
         } else {
             // offerta non valida o minore del massimo attuale (ricaricare massimo)
-            $("#off-error").html("offerta non valida o minore del massimo attuale (ricaricare massimo in tal caso)");
+            $("#pre-error").html("prenotazione non valida");
         }
 
     });
     // Validate signup form
-    $("#supf").submit(function (event) {
-        rgx_email = /^\w+@\w+\.\w{2,3}$/;
-        email = $("#email").val();
+    $("#supf").click(function (event) {
+        //event.preventDefault();
+        user = $("#user").val();
         pass1 = $("#pass").val();
         pass2 = $("#pass2").val();
-        console.log("email:", email);
-        if (!email || email === "" || !rgx_email.test(email)) {
-            event.preventDefault();
-            $("#email")[0].setCustomValidity("Email non valida");
-        }
         if (pass1 !== pass2) {
-            event.preventDefault();
+            //event.preventDefault();
             $("#pass2")[0].setCustomValidity("le due password non coincidono");
         }
+
+        $.ajax({
+            type: "POST",
+            url: "auth.php",
+            data: { user: user, pass: pass1, pass2: pass2 },
+            success: function (response) {
+                err_code = response.split("-");
+                if (err_code[0] === "user") {
+                    $("#user")[0].setCustomValidity(err_code[1]);
+                } else if (err_code[0] === "pass") {
+                    $("#pass")[0].setCustomValidity(err_code[1]);
+                } else if (err_code[0] === "pass2") {
+                    $("#pass2")[0].setCustomValidity(err_code[1]);
+                } else {
+                    window.location.replace("https://localhost/www.aste-online.com/index.php");
+                }
+            }
+        });
+
     });
+
+    // login
+    $("#signin").click(function () {
+        user = $("#user").val();
+        pass = $("#pass").val();
+        if (user && pass) {
+            if (user === "" && pass === "") {
+                $("#sign_err").html("Inserire credenziali");
+                return;
+            }
+            if (user === "") {
+                $("#user")[0].setCustomValidity("inserire username");
+                return;
+            }
+            if (pass === "") {
+                $("#pass")[0].setCustomValidity("inserire password");
+                return;
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "auth.php",
+                data: { user: user, password: pass },
+                success: function (response) {
+                    err_code = response.split("-");
+                    if (err_code[0] === "user") {
+                        $("#user")[0].setCustomValidity(err_code[1]);
+                    } else if (err_code[0] === "pass") {
+                        $("#pass")[0].setCustomValidity(err_code[1]);
+                    } else if (err_code[0] === "cred") {
+                        $("#sign_err").html(err_code[1]);
+                    } else {
+                        window.location.replace("https://localhost/www.aste-online.com/index.php");
+                    }
+                }
+            });
+
+        } else {
+
+            $("#sign_err").html("Inserire credenziali");
+            return;
+
+        }
+    });
+
 });
