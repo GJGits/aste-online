@@ -5,15 +5,13 @@
 
     define("MAXSIZE", 200);
 
-    // get current max off value
-    if($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET["inizio"]) && isset($_GET["fine"]) && isset($_GET["partecipanti"])) {
-            $inizio = $_GET["inizio"];
-            $fine = $_GET["fine"];
-            $partecipanti = $_GET["partecipanti"];
+    // get user di una prenotazione
+    if($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET["id"])) {
+            $id = $_GET["id"];
             $link=mysqli_connect(getDbHost(),getDbUser(),getDbPass(),getDbName());
-            $query="SELECT user FROM prenotazioni WHERE inizio=? AND fine=? AND partecipanti=?";
+            $query="SELECT user FROM prenotazioni WHERE id=?";
             $statement=mysqli_prepare($link,$query);
-            mysqli_stmt_bind_param($statement, "ssi", $inizio, $fine, $partecipanti);
+            mysqli_stmt_bind_param($statement, "i", $id);
             mysqli_stmt_execute($statement);
             mysqli_stmt_bind_result($statement,$user);
             mysqli_stmt_fetch($statement);
@@ -21,26 +19,24 @@
             exit;
     }
 
-    // get logs table
+    // get prenotazioni
     if($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET["table"])) {
         checkSessionValidity();
         $logged = isLoggedIn();
-        $personal = isset($_GET["personal"]);
             $link=mysqli_connect(getDbHost(),getDbUser(),getDbPass(),getDbName());
             if ($link) { 
                 $empty = true;
                 $result = "";
-                $result .= "<table class='table table-bordered table-sm'><thead><th scope='col'>inizio</th><th scope='col'>fine</th><th scope='col'>numero persone</th></thead><tbody>";
+                $result .= "<table class='table table-bordered table-sm text-center'><thead><th scope='col'>inizio</th><th scope='col'>fine</th><th scope='col'>numero persone</th><th>Elimina prenotazione</th></thead><tbody>";
                 // 2. get user table
-                $query= $logged && $personal ? "SELECT inizio, fine, partecipanti FROM prenotazioni WHERE user=? ORDER BY partecipanti DESC" : "SELECT inizio, fine, partecipanti FROM prenotazioni ORDER BY partecipanti DESC";
+                $query= "SELECT id, user, inizio, fine, partecipanti FROM prenotazioni ORDER BY partecipanti DESC";
                 $statement=mysqli_prepare($link,$query);
-                if($logged && $personal)
-                    mysqli_stmt_bind_param($statement, "s", $_SESSION["username"]);
                 mysqli_stmt_execute($statement);
-                mysqli_stmt_bind_result($statement, $inizio, $fine, $partecipanti);
+                mysqli_stmt_bind_result($statement, $id, $user, $inizio, $fine, $partecipanti);
                 while(mysqli_stmt_fetch($statement)) {
                     $empty = false;
-                    $result .= "<tr scope='row' data-inizio='" . $inizio . "' data-fine='" . $fine . "' data-partecipanti='" . $partecipanti . "'><td>" . $inizio . " </td><td>" . $fine . "</td><td>" .$partecipanti . "</td></tr>";
+                    $delete = $_SESSION["username"] == $user ? "<button data-id='" . $id . "' class='btn btn-danger btn-sm elimina'>elimina prenotazione</button>" : "";
+                    $result .= "<tr scope='row' data-id='" . $id ."' data-inizio='" . $inizio . "' data-fine='" . $fine . "' data-partecipanti='" . $partecipanti . "'><td>" . $inizio . " </td><td>" . $fine . "</td><td>" .$partecipanti . "</td> <td>" . $delete . "</td></tr>";
                 }
                 mysqli_stmt_close($statement);
                 mysqli_close($link);
@@ -63,32 +59,42 @@
             $link=mysqli_connect(getDbHost(),getDbUser(),getDbPass(),getDbName());
             if ($link) { 
                 $time_rgx = '/^\d{1,2}:\d{1,2}$/';
-                $inizio = $_POST["hhi"] . ":" . $_POST["mmi"];
-                $fine = $_POST["hhf"] . ":" . $_POST["mmf"];
-                if (strcmp($inizio, $fine) < 0 && preg_match('/^\d{1,2}:\d{1,2}$/', $inizio) && preg_match('/^\d{1,2}:\d{1,2}$/', $fine)) {
+                $inizio =  strval($_POST["hhi"]) . ":" . strval($_POST["mmi"]);
+                $fine = strval($_POST["hhf"]) . ":" . strval($_POST["mmf"]);
+                if ( ($_POST["hhi"] * 60 + $_POST["mmi"]) < ($_POST["hhf"] * 60 + $_POST["mmf"]) && preg_match('/^\d{1,2}:\d{1,2}$/', $inizio) && preg_match('/^\d{1,2}:\d{1,2}$/', $fine)) {
                    // 1. check se non eccedo limite
-                $query = "SELECT SUM(partecipanti) AS tot FROM prenotazioni WHERE inizio<=? OR fine>=?";
-                $statement=mysqli_prepare($link,$query);
-                mysqli_stmt_bind_param($statement, "ss", $inizio, $fine);
-                mysqli_stmt_execute($statement);
-                mysqli_stmt_bind_result($statement, $sum);
-                mysqli_stmt_fetch($statement);
-                mysqli_stmt_close($statement);
-                if($sum + $_POST["pers"] <= MAXSIZE) {
-                // 2. inserisco
-                $query = "INSERT INTO prenotazioni(user, inizio, fine, partecipanti) VALUES (?, ?, ?, ?)";
-                $statement=mysqli_prepare($link, $query);
-                mysqli_stmt_bind_param($statement, "sssi", $_SESSION["username"], $inizio, $fine, $_POST["pers"]);
-                mysqli_stmt_execute($statement);
-                mysqli_stmt_close($statement);
-                mysqli_close($link);
-                echo "" . $rows;
-                exit;  
-                } else {
-                    echo "too-much";
+                    $tini = $_POST["hhi"] * 60 + $_POST["mmi"];
+                    $tfini = $_POST["hhf"] * 60 + $_POST["mmf"];
+                    $query = "SELECT (SUM(s.partecipanti) + ?) as new_tot FROM slots where min BETWEEN ? AND ?";
+                    $statement=mysqli_prepare($link,$query);
+                    mysqli_stmt_bind_param($statement, "iii", $_POST["pers"], $tini, $tfini);
+                    mysqli_stmt_execute($statement);
+                    mysqli_stmt_bind_result($statement, $sum);
+                    mysqli_stmt_fetch($statement);
+                    mysqli_stmt_close($statement);
+                    if($sum <= MAXSIZE) {
+                    // 2. inserisco
+                    $query = "INSERT INTO prenotazioni(user, inizio, fine, partecipanti, tini, tfini) VALUES (?, ?, ?, ?, ?, ?)";
+                    $statement=mysqli_prepare($link, $query);
+                    mysqli_stmt_bind_param($statement, "sssiii", $_SESSION["username"], $inizio, $fine, $_POST["pers"], $tini, $tfini);
+                    mysqli_stmt_execute($statement);
+                    mysqli_stmt_close($statement);
+                    // 3. aggiorno slots
+                    $query = "UPDATE slots SET partecipanti = partecipanti + ? WHERE min BETWEEN ? AND ?";
+                    $statement=mysqli_prepare($link, $query);
+                    mysqli_stmt_bind_param($statement, "iii", $_POST["pers"], $tini, $tfini);
+                    mysqli_stmt_execute($statement);
+                    mysqli_stmt_close($statement);
+                    mysqli_close($link);
+                    echo "" . $rows;
+                    exit;  
+                    } else {
+                        echo "too-much";
+                        exit();
                 } 
                 } else {
                     echo "err-time";
+                    exit();
                 }
                 
                 
@@ -101,7 +107,53 @@
 
     }
 
+    // delete prenotazione
+    if($_SERVER["REQUEST_METHOD"] == "DELETE" && isset($_GET["id"])) {
+        $id = $_GET["id"];
+        //1. check che la prenotazione appartiene all'utente
+        checkSessionValidity();
+        if(isset($_SESSION["username"])) {
+            $link=mysqli_connect(getDbHost(),getDbUser(),getDbPass(),getDbName());
+            if ($link) { 
+                $query = "SELECT user, tini, tfini, partecipanti FROM prenotazioni WHERE id=?";
+                $statement=mysqli_prepare($link,$query);
+                mysqli_stmt_bind_param($statement, "i", $id);
+                mysqli_stmt_execute($statement);
+                mysqli_stmt_bind_result($statement, $user, $tini, $tfini, $partecipanti);
+                mysqli_stmt_fetch($statement);
+                mysqli_stmt_close($statement);
+                //2. se ok elimino prenotazione
+                if ($_SESSION["username"] == $user) {
+                    $query = "DELETE FROM prenotazioni WHERE id=?";
+                    $statement=mysqli_prepare($link,$query);
+                    mysqli_stmt_bind_param($statement, "i", $id);
+                    mysqli_stmt_execute($statement);
+                    mysqli_stmt_fetch($statement);
+                    mysqli_stmt_close($statement);
+                    // 3. aggiorno slots
+                    $query = "UPDATE slots SET partecipanti = partecipanti - ? WHERE min BETWEEN ? AND ?";
+                    $statement=mysqli_prepare($link, $query);
+                    mysqli_stmt_bind_param($statement, "iii", $partecipanti, $tini, $tfini);
+                    mysqli_stmt_execute($statement);
+                    mysqli_stmt_close($statement);
+                    mysqli_close($link);
+                    echo "ok";
+                    exit();
+                } else {
+                    echo "invalid";
+                    exit();
+                }
+            }
+            else {
+                echo "db-error";
+                exit();
+            }
+        }
+        echo "scaduta";
+        exit();
+    }
+
     // no method selected return to index
     header("location: index.php");
-    exit;
+    exit();
 ?>

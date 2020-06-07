@@ -102,7 +102,8 @@
         
             if(password_verify($password, $hashed_pass)) {
                 $_SESSION["username"] = $email;
-                echo "ok";
+                //echo "ok";
+                header("location: index.php");
                 exit();
             } else {
                 echo "cred-Credenziali non valide";

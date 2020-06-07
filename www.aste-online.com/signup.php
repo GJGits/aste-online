@@ -27,7 +27,7 @@
 <div class="col-9">
     <form class="bg-warning col-6 offset-3 bg-lg p-2">
   <div class="form-group">
-    <label for="exampleInputEmail1">Email address</label>
+    <label for="exampleInputEmail1">Inserire username</label>
     <input type="text" class="form-control" id="user" name="user" aria-describedby="emailHelp" placeholder="Enter username">
   </div>
   <div class="form-group">

@@ -40,19 +40,19 @@ $logged=isLoggedIn();
           
           <div class="row offset-3 mt-4">
             <span >Seleziona inizio:</span>
-            <input class="col-2 ml-2" id="ini-hh" type="number" min=0 max=23 value="0">
-            <input class="col-2 ml-2" id="ini-mm" type="number" min=0 max=59 value="0">
+            <span class="ml-2">hh</span><input class="col-3 ml-2" id="ini-hh" type="number" min=0 max=23 value="0">
+            <span class="ml-2">mm</span><input class="col-3 ml-2" id="ini-mm" type="number" min=0 max=59 value="0">
           </div>
 
           <div class="row offset-3 mt-2">
             <span>Seleziona fine: </span>
-            <input class="col-2 ml-2"  id="fin-hh" type="number" min=0 max=23 value="0">
-            <input class="col-2 ml-2"  id="fin-mm" type="number" min=0 max=59 value="0">
+            <span class="ml-2">hh</span> <input class="col-3 ml-2"  id="fin-hh" type="number" min=0 max=23 value="0">
+            <span class="ml-2">mm</span><input class="col-3 ml-2"  id="fin-mm" type="number" min=0 max=59 value="0">
           </div>
 
           <div class="row mt-2">
             <span class="offset-3">Seleziona numero persone</span>
-            <input class="col-2 ml-2" id="npers" type="number" min=1 max=200>
+            <input class="col-2 ml-2" id="npers" type="number" min=1 max=200 value="1">
           </div>
 
 
