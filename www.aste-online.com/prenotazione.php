@@ -65,7 +65,7 @@
                    // 1. check se non eccedo limite
                     $tini = $_POST["hhi"] * 60 + $_POST["mmi"];
                     $tfini = $_POST["hhf"] * 60 + $_POST["mmf"];
-                    $query = "SELECT (SUM(s.partecipanti) + ?) as new_tot FROM slots where min BETWEEN ? AND ?";
+                    $query = "SELECT (MAX(s.partecipanti) + ?) as new_tot FROM slots s where min BETWEEN ? AND ?";
                     $statement=mysqli_prepare($link,$query);
                     mysqli_stmt_bind_param($statement, "iii", $_POST["pers"], $tini, $tfini);
                     mysqli_stmt_execute($statement);

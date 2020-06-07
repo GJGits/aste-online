@@ -36,6 +36,8 @@ sessionStart(TRUE);
   <p id="sing_err" class="text-danger text-center"><b><?php 
   ?></b></p>
   <button type="button" id="signin" class="btn btn-primary btn-block mt-5">Sign in</button>
+  <b class="text-danger text-center" id="sign_err">
+  </b>
 </form>
 
 <?php include "noscript.php";?>
